@@ -1,14 +1,12 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
 import "./App.css";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Layout from "./pages/Layout/Layout";
 import Login from "./pages/Login/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Classes from "./pages/Classes/Classes";
 import Students from "./pages/Students/Students";
+import Teachers from "./pages/Teachers/Teachers";
 
 function App() {
   const router = createBrowserRouter([
@@ -32,13 +30,17 @@ function App() {
           path: "students",
           element: <Students />,
         },
+        {
+          path: "teachers",
+          element: <Teachers />,
+        },
       ],
     },
   ]);
 
   return (
     <>
-      <p>hello world</p>
+    <RouterProvider router={router} />
     </>
   );
 }

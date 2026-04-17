@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Classes from "./pages/Classes/Classes";
 import Students from "./pages/Students/Students";
 import Teachers from "./pages/Profile/Profile";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,8 +32,8 @@ function App() {
           element: <Students />,
         },
         {
-          path: "teachers",
-          element: <Teachers />,
+          path: "profile",
+          element: <Profile />,
         },
       ],
     },

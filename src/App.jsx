@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./App.css";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Layout from "./pages/Layout/Layout";
@@ -6,7 +5,7 @@ import Login from "./pages/Login/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Classes from "./pages/Classes/Classes";
 import Students from "./pages/Students/Students";
-import Teachers from "./pages/Profile/Profile";
+import Teachers from "./pages/Teachers/TeacherClassDetail";
 
 function App() {
   const router = createBrowserRouter([

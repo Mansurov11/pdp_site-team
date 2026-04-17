@@ -1,6 +1,6 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
 import Pdp from "../../assets/pdp.png";
 
@@ -10,57 +10,43 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (evt) => {
+  const handleSubmit = (evt) => {
     evt.preventDefault();
-    
-    // Basic validation to prevent unnecessary requests
-    if (!email || !password) {
-      return toast.error("Barcha maydonlarni to'ldiring!");
-    }
+    login(email, password);
+  };
 
+  async function login(email, password) {
     try {
       setLoading(true);
-      
-      // Changed from /api/docs to /api/login
       const res = await axios.post(
-        `https://pdp-system-backend-1.onrender.com/api/login`,
-        { email, password },
-        { headers: { 'Content-Type': 'application/json' } }
+        `https://pdp-system-backend-1.onrender.com/api/v1/auth/login`,
+        { email, password }
       );
 
-      // Check if user and token exist in response
-      if (res.data && res.data.token) {
-        if (res.data.user && res.data.user.role === "admin") {
-          toast.success("Muvaffaqiyatli kirildi!");
-          localStorage.setItem("token", res.data.token);
-          navigate("/home");
-        } else {
-          toast.warning("Siz admin emassiz!");
-        }
-      } else {
-        toast.error("Ma'lumot topilmadi!");
-      }
+      // FIXED: Accessing the nested data object from your API response
+      const { accessToken, user } = res.data.data;
 
-    } catch (err) {
-      // Detailed error messages to help you debug
-      if (err.response) {
-        // The server responded with a status other than 2xx
-        toast.error(err.response.data.message || "Email yoki parol noto'g'ri!");
-      }  else {
-        toast.error("Noma'lum xatolik yuz berdi.");
+      if (user.role === "teacher" || user.role === "admin") {
+        toast.success("Muvaffaqiyatli kirildi!");
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+        navigate("/home");
+      } else {
+        toast.warning("Siz admin emassiz!");
       }
-      console.error("Login Details:", err);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const isDesktop = window.innerWidth >= 1024;
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", width: "100%", overflow: "hidden" }}>
 
-      {/* ── Left Panel ── */}
+      {/* ── Left Panel — EXACT ORIGINAL STYLES ── */}
       {isDesktop && (
         <div
           style={{
@@ -76,6 +62,7 @@ const Login = () => {
             flexShrink: 0,
           }}
         >
+          {/* Diagonal shimmer restored */}
           <div
             style={{
               position: "absolute",
@@ -86,6 +73,7 @@ const Login = () => {
             }}
           />
 
+          {/* Logo + Quote column restored */}
           <div style={{ display: "flex", flexDirection: "column", gap: "32px", zIndex: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div
@@ -101,7 +89,7 @@ const Login = () => {
                   flexShrink: 0,
                 }}
               >
-                <img src={Pdp} alt="PDP" style={{ width: "70%" }} />
+                <img src={Pdp} alt="" />
               </div>
               <div>
                 <div style={{ color: "white", fontWeight: 700, fontSize: 20, lineHeight: 1.2 }}>
@@ -125,7 +113,7 @@ const Login = () => {
         </div>
       )}
 
-      {/* ── Right Panel ── */}
+      {/* ── Right Panel — EXACT ORIGINAL STYLES ── */}
       <div
         style={{
           flex: 1,
@@ -146,20 +134,7 @@ const Login = () => {
             Davom etish uchun hisobingizga kiring
           </p>
 
-          <div
-            style={{
-              background: "#eef2ff",
-              border: "1px solid #e0e7ff",
-              borderRadius: 12,
-              padding: "16px",
-              marginBottom: 32,
-              fontSize: 13,
-            }}
-          >
-            <p style={{ color: "#374151", fontWeight: 600, marginBottom: 8 }}>Demo hisob:</p>
-            <p style={{ color: "#4f46e5" }}>Admin: admin@pdp.uz</p>
-            <p style={{ color: "#4f46e5" }}>Parol: istalgan matn</p>
-          </div>
+        
 
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 20 }}>
@@ -168,7 +143,6 @@ const Login = () => {
               </label>
               <input
                 type="email"
-                required
                 placeholder="email@pdp.uz"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -191,7 +165,6 @@ const Login = () => {
               </label>
               <input
                 type="password"
-                required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -210,7 +183,7 @@ const Login = () => {
 
             <div style={{ marginBottom: 24 }}>
               <span style={{ color: "#4f46e5", fontSize: 14, cursor: "pointer" }}>
-                Parolni unutdingizmi?
+                Parolni unutdingizmi? Ustozingizga Ayting!
               </span>
             </div>
 
@@ -238,7 +211,7 @@ const Login = () => {
           <p style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
             Hisobingiz yo'qmi?{" "}
             <span style={{ color: "#4f46e5", cursor: "pointer", fontWeight: 500 }}>
-              Ro'yxatdan o'tish
+             Ustozingizga Ayting!
             </span>
           </p>
         </div>

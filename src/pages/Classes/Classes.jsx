@@ -14,7 +14,7 @@ const Classes = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {myClasses.map((cls) => (
-          <div key={cls.id} className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
+          <div key={cls.id} className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
             {/* Top Row */}
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -40,7 +40,7 @@ const Classes = () => {
               </div>
             </div>
 
-            <div className="h-[1px] bg-gray-100 mb-4" />
+            <div className="h-px bg-gray-100 mb-4" />
 
             {/* Warnings Section */}
             <div className="flex gap-4">

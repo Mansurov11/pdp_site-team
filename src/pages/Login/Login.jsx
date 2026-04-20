@@ -23,7 +23,7 @@ const Login = () => {
         { email, password }
       );
 
-      // FIXED: Accessing the nested data object from your API response
+
       const { accessToken, user } = res.data.data;
 
       if (user.role === "teacher" || user.role === "admin") {

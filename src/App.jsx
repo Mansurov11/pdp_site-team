@@ -1,4 +1,8 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Layout from "./pages/Layout/Layout";
 import Login from "./pages/Login/Login";
 import LandingPage from "./pages/LandingPage/LandingPage"; // Import your new Landing Page
@@ -7,6 +11,7 @@ import Classes from "./pages/Classes/Classes";
 import History from "./pages/History/History";
 import Profile from "./pages/Profile/Profile";
 import Statistics from "./pages/Statistics/Statistics";
+import { ToastContainer } from "react-toastify";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -66,7 +71,12 @@ function App() {
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </>
+  );
 }
 
 export default App;

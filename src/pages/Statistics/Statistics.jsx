@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Calendar, TrendingUp, Users, Award } from "lucide-react";
 
-const Dashboard = () => {
+const Statistics = () => {
   const [hoveredBar, setHoveredBar] = useState(null);
 
   const stats = [
@@ -21,60 +21,14 @@ const Dashboard = () => {
     { date: "17.04", value: 0 },
   ];
 
-  const activities = [
-    {
-      name: "Alisher Karimov",
-      action: "Darsga kechikish",
-      desc: "Ertalabki darsga 10 daqiqa kechikdi",
-      score: "-1",
-      date: "15.04.2026 08:15",
-      initials: "AK",
-      type: "negative",
-    },
-    {
-      name: "Alisher Karimov",
-      action: "Maktab tadbirida faol ishtirok",
-      desc: "Maktab tanlovida faol qatnashdi va yaxshi natija ko'rsatdi",
-      score: "+2",
-      date: "14.04.2026 14:30",
-      initials: "AK",
-      type: "positive",
-    },
-    {
-      name: "Nigora Rashidova",
-      action: "Darsda telefondan foydalanish",
-      desc: "Matematika darsida telefonda o'yin o'ynadi",
-      score: "-2",
-      date: "13.04.2026 11:20",
-      initials: "NR",
-      type: "negative",
-    },
-    {
-      name: "Zarina Turgunova",
-      action: "Sinfdoshga zo'ravonlik",
-      desc: "Sinfdoshini jabrlab, mobaynida nizo bo'ldi",
-      score: "-3",
-      date: "12.04.2026 13:00",
-      initials: "ZT",
-      type: "negative",
-    },
-    {
-      name: "Madina Yusupova",
-      action: "A'lo baholar (chorak)",
-      desc: "Barcha fanlarda a'lo natijalar",
-      score: "+3",
-      date: "10.04.2026 10:00",
-      initials: "MY",
-      type: "positive",
-    },
-  ];
+
 
   return (
     <div className="w-full max-w-[1600px] mx-auto p-2">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Bosh sahifa</h1>
-        <p className="text-gray-400 text-sm mt-1 font-medium">O'qituvchi paneli</p>
+        <h1 className="text-3xl font-bold text-gray-900">Statistika</h1>
+        <p className="text-gray-400 text-sm mt-1 font-medium">O'qituvchi statistikasi paneli</p>
       </div>
 
       {/* 1. Stats Cards Section */}
@@ -146,48 +100,9 @@ const Dashboard = () => {
       </div>
 
       {/* 3. Recent Activity Section */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-10">
-        <div className="p-6 border-b border-gray-50">
-          <h3 className="text-[17px] font-bold text-gray-800">So'nggi faoliyat</h3>
-        </div>
-
-        <div className="flex flex-col">
-          {activities.map((item, index) => (
-            <div 
-              key={index} 
-              className="flex items-start justify-between p-6 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex gap-4">
-                {/* Avatar Initials */}
-                <div className="w-11 h-11 rounded-full bg-[#EEF2FF] flex items-center justify-center text-[#818CF8] text-[13px] font-bold shrink-0">
-                  {item.initials}
-                </div>
-                
-                {/* Content */}
-                <div>
-                  <h4 className="text-[15px] font-bold text-gray-800 leading-tight">{item.name}</h4>
-                  <p className="text-[14px] text-gray-500 mt-1">{item.action}</p>
-                  <p className="text-[12px] text-gray-400 mt-3 font-medium">{item.desc}</p>
-                </div>
-              </div>
-
-              {/* Right side: Badge and Date */}
-              <div className="flex flex-col items-end justify-between min-h-[70px]">
-                <span className={`px-4 py-1 rounded-full text-[13px] font-bold ${
-                  item.type === "positive" 
-                    ? "bg-[#F0FDF4] text-[#22C55E]" 
-                    : "bg-[#FEF2F2] text-[#F87171]"
-                }`}>
-                  {item.score}
-                </span>
-                <span className="text-[11px] text-gray-400 mt-auto font-medium">{item.date}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      
     </div>
   );
 };
 
-export default Dashboard;
+export default Statistics;

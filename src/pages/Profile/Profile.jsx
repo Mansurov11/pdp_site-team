@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
 const Profile = () => {
-  // --- 1. State for Notification Switches ---
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   const [settings, setSettings] = useState({
     email: true,
     complaint: true,
@@ -10,27 +11,23 @@ const Profile = () => {
   });
 
   const handleToggle = (key) => {
-    setSettings((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
     <div className="px-5 font-sans text-[#334155] mb-10">
       <h4 className="text-3xl font-bold mb-1">Profil</h4>
-      <p className="text-slate-500 mb-8">
-        O'qituvchi hisobi — shaxsiy ma'lumotlar va sozlamalar
-      </p>
+      <p className="text-slate-500 mb-8">O'qituvchi hisobi — shaxsiy ma'lumotlar va sozlamalar</p>
 
-      {/* --- Top Profile Header Card --- */}
       <div className="bg-white border border-gray-100 rounded-[24px] p-8 shadow-sm max-w-8xl">
         <div className="flex flex-col gap-8">
           <div className="flex justify-between items-start">
-            <div className="flex gap-6">
+            <div className="flex gap-6 items-center">
               <div className="relative">
                 <div className="w-28 h-28 bg-[#EEF2FF] rounded-[20px] flex items-center justify-center">
-                  <span className="text-[#6366F1] text-3xl font-bold">DR</span>
+                  <span className="text-[#6366F1] text-4xl font-bold uppercase">
+                    {(user?.fullName || user?.name || "U")[0]}
+                  </span>
                 </div>
                 <button className="absolute bottom-1 -right-2 bg-[#4F46E5] p-2 rounded-full text-white shadow-lg border-2 border-white">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -40,12 +37,14 @@ const Profile = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <h3 className="text-2xl font-bold text-slate-900">Dilnoza Rahimova</h3>
-                <h5 className="text-[#6366F1] font-semibold">Matematika o'qituvchisi</h5>
-                <p className="text-slate-400 text-sm mb-2">dilnoza@pdp.uz</p>
+                <h3 className="text-2xl font-bold text-slate-900 leading-tight">
+                  {user?.fullName || user?.name || "Foydalanuvchi"}
+                </h3>
+                <h5 className="text-[#6366F1] font-semibold">{user?.role || "O'qituvchi"}</h5>
+                <p className="text-slate-400 text-sm mb-2">{user?.email || "email@pdp.uz"}</p>
                 <div className="flex gap-2">
-                  <span className="bg-[#EEF2FF] text-[#6366F1] px-3 py-1 rounded-full text-xs font-bold">10-A</span>
-                  <span className="bg-[#EEF2FF] text-[#6366F1] px-3 py-1 rounded-full text-xs font-bold">10-B</span>
+                  <span className="bg-[#EEF2FF] text-[#6366F1] px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase">10-A Sinifi</span>
+                  <span className="bg-[#EEF2FF] text-[#6366F1] px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase">10-B Sinifi</span>
                 </div>
               </div>
             </div>
@@ -54,22 +53,22 @@ const Profile = () => {
               <div className="w-20 h-20 rounded-full bg-[#EEF2FF] flex items-center justify-center border-4 border-white shadow-sm">
                 <span className="text-[#4F46E5] text-2xl font-bold">45</span>
               </div>
-              <p className="text-xs text-slate-500 mt-2 font-medium uppercase tracking-wider">Jami harakatlar</p>
+              <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-widest">Harakatlar</p>
             </div>
           </div>
 
           <div className="h-[1px] bg-gray-100 w-full"></div>
 
           <div className="grid grid-cols-3 text-center divide-x divide-gray-100">
-            <div className="flex flex-col gap-1">
+            <div>
               <h3 className="text-[#6366F1] text-3xl font-bold">2</h3>
-              <p className="text-slate-500 text-sm">Tayinlangan sinflar</p>
+              <p className="text-slate-500 text-sm">Sinflar</p>
             </div>
-            <div className="flex flex-col gap-1">
+            <div>
               <h3 className="text-slate-900 text-3xl font-bold">45</h3>
-              <p className="text-slate-500 text-sm">Jami harakatlar</p>
+              <p className="text-slate-500 text-sm">Ballar</p>
             </div>
-            <div className="flex flex-col gap-1">
+            <div>
               <h3 className="text-[#059669] text-3xl font-semibold">Faol</h3>
               <p className="text-slate-500 text-sm">Holat</p>
             </div>
@@ -77,102 +76,81 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* --- Detail Cards Grid --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-7">
-        
-        {/* Card 1: Personal Info */}
         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
-          <div className="flex justify-between mb-8">
-            <h3 className="text-[17px] font-bold flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg> 
-              Shaxsiy ma'lumotlar
-            </h3>
-            <button className="text-sm text-[#6366F1] font-medium hover:underline transition-all">Tahrirlash</button>
-          </div>
+          <h3 className="text-[17px] font-bold mb-8">Shaxsiy ma'lumotlar</h3>
           <div className="space-y-6">
-            <InfoRow label="To'liq ism" value="Dilnoza Rahimova" />
-            <InfoRow label="Elektron pochta" value="dilnoza@pdp.uz" />
-            <InfoRow label="Telefon raqami" value="+998 90 123 45 67" />
-            <InfoRow label="Fan" value="Matematika" />
+            <InfoRow label="Ism" value={user?.fullName || user?.name || "Kiritilmagan"} />
+            <InfoRow label="Email" value={user?.email || "Mavjud emas"} />
+            <InfoRow label="Telefon" value={user?.phone || "+998 90 000 00 00"} />
+            <InfoRow label="Lavozim" value={user?.role || "Matematika O'qituvchisi"} />
           </div>
         </div>
 
-        {/* Card 2: Notifications (Usable Switches) */}
         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
-          <h3 className="text-[17px] font-bold flex items-center gap-2 mb-8">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            Bildirishnomalar
-          </h3>
+          <h3 className="text-[17px] font-bold mb-8">Bildirishnomalar</h3>
           <div className="space-y-6">
-            <ToggleRow title="Email xabarnomalar" desc="O'quvchi ball o'zgarganda" active={settings.email} onToggle={() => handleToggle('email')} />
-            <ToggleRow title="Shikoyat xabarnomasi" desc="Yangi shikoyat kelib tushganda" active={settings.complaint} onToggle={() => handleToggle('complaint')} />
-            <ToggleRow title="Haftalik hisobot" desc="Sinflar bo'yicha haftalik xulosalar" active={settings.weekly} onToggle={() => handleToggle('weekly')} />
-            <ToggleRow title="Tizim yangilanishlari" desc="Platforma yangiliklari haqida" active={settings.updates} onToggle={() => handleToggle('updates')} />
+            <ToggleRow 
+              title="Email xabarnomalar" 
+              desc="Yangi ballar haqida xabar berish" 
+              active={settings.email} 
+              onToggle={() => handleToggle('email')} 
+            />
+            <ToggleRow 
+              title="Haftalik hisobot" 
+              desc="Dushanba kungi xulosalar" 
+              active={settings.weekly} 
+              onToggle={() => handleToggle('weekly')} 
+            />
+            <ToggleRow 
+              title="Tizim yangilanishlari" 
+              desc="Yangi funksiyalar haqida" 
+              active={settings.updates} 
+              onToggle={() => handleToggle('updates')} 
+            />
           </div>
         </div>
 
-        {/* Card 3: Security (Usable Eye Toggle) */}
         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
-          <h3 className="text-[17px] font-bold flex items-center gap-2 mb-8">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Xavfsizlik
-          </h3>
+          <h3 className="text-[17px] font-bold mb-8">Xavfsizlik</h3>
           <div className="space-y-5">
             <PasswordInput label="Joriy parol" />
             <PasswordInput label="Yangi parol" />
-            <PasswordInput label="Yangi parolni tasdiqlang" />
-            <button className="bg-[#4F46E5] text-white px-6 py-3 rounded-xl text-sm font-bold mt-4 hover:bg-[#4338ca] shadow-md transition-all active:scale-95">
+            <button className="bg-[#4F46E5] text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-[#4338ca] active:scale-95 transition-all">
               Parolni saqlash
             </button>
           </div>
         </div>
 
-        {/* Card 4: Classes */}
         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
-          <h3 className="text-[17px] font-bold flex items-center gap-2 mb-8">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            Tayinlangan sinflar
-          </h3>
+          <h3 className="text-[17px] font-bold mb-8">Tayinlangan sinflar</h3>
           <div className="space-y-4">
             <ClassRow code="10-A" name="10-A sinfi" subject="Matematika" />
             <ClassRow code="10-B" name="10-B sinfi" subject="Matematika" />
           </div>
         </div>
-
       </div>
     </div>
   );
 };
 
-// --- Reusable Logic Components ---
-
 const InfoRow = ({ label, value }) => (
   <div className="flex items-center gap-4">
-    <div className="w-10 h-10 bg-[#F8FAFC] rounded-xl flex items-center justify-center border border-slate-50 shrink-0">
-      <div className="w-1.5 h-1.5 bg-[#6366F1] rounded-full"></div>
-    </div>
-    <div className="flex-1 border-b border-slate-50 pb-3">
+    <div className="w-1.5 h-1.5 bg-[#6366F1] rounded-full"></div>
+    <div className="flex-1">
       <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{label}</p>
-      <p className="text-[15px] text-slate-700 font-bold mt-0.5">{value}</p>
+      <p className="text-[15px] text-slate-700 font-bold">{value}</p>
     </div>
   </div>
 );
 
 const ToggleRow = ({ title, desc, active, onToggle }) => (
-  <div className="flex justify-between items-center cursor-pointer group" onClick={onToggle}>
+  <div className="flex justify-between items-center group cursor-pointer" onClick={onToggle}>
     <div>
       <p className="text-[15px] font-bold text-slate-700">{title}</p>
-      <p className="text-[12px] text-slate-400 font-medium">{desc}</p>
+      <p className="text-[12px] text-slate-400">{desc}</p>
     </div>
-    <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${active ? 'bg-[#4F46E5]' : 'bg-slate-200'}`}>
+    <div className={`w-11 h-6 rounded-full relative transition-all duration-300 ${active ? 'bg-[#4F46E5]' : 'bg-slate-200'}`}>
       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-300 ${active ? 'right-1' : 'left-1'}`} />
     </div>
   </div>
@@ -182,28 +160,17 @@ const PasswordInput = ({ label }) => {
   const [show, setShow] = useState(false);
   return (
     <div>
-      <label className="text-[11px] text-slate-400 font-bold uppercase mb-2 block tracking-wide">{label}</label>
+      <label className="text-[11px] text-slate-400 font-bold uppercase mb-2 block">{label}</label>
       <div className="relative">
         <input 
           type={show ? "text" : "password"} 
           defaultValue="password123" 
-          className="w-full bg-[#F8FAFC] border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all font-medium" 
+          className="w-full bg-[#F8FAFC] border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all" 
         />
-        <button 
-          type="button"
-          onClick={() => setShow(!show)}
-          className="absolute right-4 top-3.5 text-slate-300 hover:text-indigo-500 transition-colors"
-        >
-          {show ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-          )}
+        <button type="button" onClick={() => setShow(!show)} className="absolute right-4 top-3.5 text-slate-300 hover:text-indigo-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={show ? "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" : "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"} />
+          </svg>
         </button>
       </div>
     </div>
@@ -213,7 +180,7 @@ const PasswordInput = ({ label }) => {
 const ClassRow = ({ code, name, subject }) => (
   <div className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl hover:bg-[#F8FAFC] transition-all cursor-pointer group shadow-sm">
     <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-[#EEF2FF] rounded-xl flex items-center justify-center text-[#6366F1] font-extrabold text-sm border border-indigo-50">
+      <div className="w-12 h-12 bg-[#EEF2FF] rounded-xl flex items-center justify-center text-[#6366F1] font-extrabold text-sm border border-indigo-50 uppercase">
         {code}
       </div>
       <div>

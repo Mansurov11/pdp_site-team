@@ -70,7 +70,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto p-2">
+    <div className="w-full max-w-400 mx-auto p-2">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Bosh sahifa</h1>
@@ -80,9 +80,9 @@ const Dashboard = () => {
       {/* 1. Stats Cards Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((item, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-[135px] flex flex-col justify-between">
+          <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-33.75 flex flex-col justify-between">
             <div className="flex justify-between items-start">
-              <span className="text-gray-500 text-[13px] font-medium leading-tight max-w-[120px]">{item.title}</span>
+              <span className="text-gray-500 text-[13px] font-medium leading-tight max-w-30">{item.title}</span>
               <div className="text-indigo-600 bg-indigo-50 p-2 rounded-lg">{item.icon}</div>
             </div>
             <div className="text-3xl font-bold text-gray-800">{item.value}</div>
@@ -94,7 +94,7 @@ const Dashboard = () => {
       <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm w-full mb-8">
         <h3 className="text-[16px] font-bold text-gray-800 mb-12">Haftalik faollik</h3>
 
-        <div className="relative flex h-[380px] w-full border-b border-gray-300 ml-8">
+        <div className="relative flex h-95 w-full border-b border-gray-300 ml-8">
           {/* Y-Axis Labels */}
           <div className="absolute -left-14 h-full flex flex-col justify-between text-[13px] text-gray-400 pb-1 text-right w-10">
             <span>3</span>
@@ -130,7 +130,7 @@ const Dashboard = () => {
                 >
                   {/* Tooltip */}
                   {hoveredBar === idx && (
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-1/2 z-50 bg-white border border-gray-100 shadow-2xl p-3 rounded-sm min-w-[100px] pointer-events-none">
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-1/2 z-50 bg-white border border-gray-100 shadow-2xl p-3 rounded-sm min-w-25 pointer-events-none">
                       <p className="text-gray-500 text-[11px] mb-1">{bar.date}</p>
                       <p className="text-[#5b52f0] text-[13px] font-bold whitespace-nowrap">ballar : {bar.value}</p>
                     </div>
@@ -172,7 +172,7 @@ const Dashboard = () => {
               </div>
 
               {/* Right side: Badge and Date */}
-              <div className="flex flex-col items-end justify-between min-h-[70px]">
+              <div className="flex flex-col items-end justify-between min-h-17.5">
                 <span className={`px-4 py-1 rounded-full text-[13px] font-bold ${
                   item.type === "positive" 
                     ? "bg-[#F0FDF4] text-[#22C55E]" 

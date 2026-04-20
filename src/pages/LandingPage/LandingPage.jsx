@@ -17,7 +17,7 @@ const LandingPage = () => {
           </div>
         </div>
         <div className="flex items-center gap-6 ">
-          <button onClick={() => navigate("/login")} className="w-full sm:w-auto bg-[#4F46E5] text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/login")} className="w-full sm:w-auto bg-[#4F46E5] text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
             Kirish
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -56,7 +56,7 @@ const LandingPage = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
         
-          <button onClick={() => navigate("/login")} className="w-full sm:w-auto bg-[#4F46E5] text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/login")} className="w-full sm:w-auto bg-[#4F46E5] text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
             Kirish
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -86,7 +86,7 @@ const StatCard = ({ icon, count, label }) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-center mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-[#6366F1]">
           {icons[icon]}

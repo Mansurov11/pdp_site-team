@@ -15,7 +15,7 @@ const Header = () => {
     <header className="w-full h-16 bg-white border-b border-gray-100 px-6 flex items-center justify-between shadow-sm">
       {/* Logo Section */}
       <div className="flex items-center gap-2">
-        <div className="w-[45px] h-[45px] bg-white rounded-[16px] flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] shrink-0">
+        <div className="w-11.25 h-11.25 bg-white rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.15)] shrink-0">
           <img src={Pdp} alt="PDP Logo" className="w-8 h-8 object-contain" />
         </div>
         <span className="font-bold text-gray-800 text-base">PDP School</span>

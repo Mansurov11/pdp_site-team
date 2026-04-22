@@ -19,7 +19,7 @@ const Profile = () => {
       <h4 className="text-3xl font-bold mb-1">Profil</h4>
       <p className="text-slate-500 mb-8">O'qituvchi hisobi — shaxsiy ma'lumotlar va sozlamalar</p>
 
-      <div className="bg-white border border-gray-100 rounded-[24px] p-8 shadow-sm max-w-8xl">
+      <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm max-w-8xl">
         <div className="flex flex-col gap-8">
           <div className="flex justify-between items-start">
             <div className="flex gap-6 items-center">
@@ -57,7 +57,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="h-[1px] bg-gray-100 w-full"></div>
+          <div className="h-px bg-gray-100 w-full"></div>
 
           <div className="grid grid-cols-3 text-center divide-x divide-gray-100">
             <div>
@@ -164,7 +164,7 @@ const PasswordInput = ({ label }) => {
       <div className="relative">
         <input 
           type={show ? "text" : "password"} 
-          defaultValue="password123" 
+          defaultValue={localStorage.getItem("password")} 
           className="w-full bg-[#F8FAFC] border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all" 
         />
         <button type="button" onClick={() => setShow(!show)} className="absolute right-4 top-3.5 text-slate-300 hover:text-indigo-500">

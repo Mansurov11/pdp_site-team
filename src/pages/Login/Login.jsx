@@ -20,15 +20,15 @@ const Login = () => {
       setLoading(true);
       const res = await axios.post(
         `https://pdp-system-backend-1.onrender.com/api/v1/auth/login`,
-        { email, password }
+        { email, password },
       );
-
 
       const { accessToken, user } = res.data.data;
 
       if (user.role === "teacher" || user.role === "admin") {
         toast.success("Muvaffaqiyatli kirildi!");
         localStorage.setItem("token", accessToken);
+        localStorage.setItem("password", password);
         localStorage.setItem("user", JSON.stringify(user));
         navigate("/home");
       } else {
@@ -41,11 +41,18 @@ const Login = () => {
     }
   }
 
+
   const isDesktop = window.innerWidth >= 1024;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", width: "100%", overflow: "hidden" }}>
-
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
       {/* ── Left Panel — EXACT ORIGINAL STYLES ── */}
       {isDesktop && (
         <div
@@ -58,7 +65,8 @@ const Login = () => {
             padding: "40px",
             position: "relative",
             overflow: "hidden",
-            background: "linear-gradient(135deg, #5b52f0 0%, #4338ca 40%, #3730a3 100%)",
+            background:
+              "linear-gradient(135deg, #5b52f0 0%, #4338ca 40%, #3730a3 100%)",
             flexShrink: 0,
           }}
         >
@@ -69,12 +77,19 @@ const Login = () => {
               inset: 0,
               pointerEvents: "none",
               background: `linear-gradient(-132.5deg, #6366f1 50%, transparent 50%)`,
-              zIndex: 1
+              zIndex: 1,
             }}
           />
 
           {/* Logo + Quote column restored */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "32px", zIndex: 10 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "32px",
+              zIndex: 10,
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div
                 style={{
@@ -92,15 +107,32 @@ const Login = () => {
                 <img src={Pdp} alt="" />
               </div>
               <div>
-                <div style={{ color: "white", fontWeight: 700, fontSize: 20, lineHeight: 1.2 }}>
+                <div
+                  style={{
+                    color: "white",
+                    fontWeight: 700,
+                    fontSize: 20,
+                    lineHeight: 1.2,
+                  }}
+                >
                   PDP School
                 </div>
-                <div style={{ color: "#a5b4fc", fontSize: 13 }}>O'quvchi Etikasi Indeksi</div>
+                <div style={{ color: "#a5b4fc", fontSize: 13 }}>
+                  O'quvchi Etikasi Indeksi
+                </div>
               </div>
             </div>
 
             <div>
-              <p style={{ color: "white", fontSize: 22, fontWeight: 600, lineHeight: 1.4, marginBottom: 8 }}>
+              <p
+                style={{
+                  color: "white",
+                  fontSize: 22,
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                  marginBottom: 8,
+                }}
+              >
                 "Tartib va intizom - muvaffaqiyatning kaliti"
               </p>
               <p style={{ color: "#a5b4fc", fontSize: 13 }}>- PDP School</p>
@@ -127,18 +159,31 @@ const Login = () => {
         }}
       >
         <div style={{ width: "100%", maxWidth: 440 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 700, color: "#111827", marginBottom: 4 }}>
+          <h2
+            style={{
+              fontSize: 30,
+              fontWeight: 700,
+              color: "#111827",
+              marginBottom: 4,
+            }}
+          >
             Xush kelibsiz
           </h2>
           <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 32 }}>
             Davom etish uchun hisobingizga kiring
           </p>
 
-        
-
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#374151", marginBottom: 6 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#374151",
+                  marginBottom: 6,
+                }}
+              >
                 Email
               </label>
               <input
@@ -160,7 +205,15 @@ const Login = () => {
             </div>
 
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#374151", marginBottom: 6 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#374151",
+                  marginBottom: 6,
+                }}
+              >
                 Parol
               </label>
               <input
@@ -182,7 +235,9 @@ const Login = () => {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <span style={{ color: "#4f46e5", fontSize: 14, cursor: "pointer" }}>
+              <span
+                style={{ color: "#4f46e5", fontSize: 14, cursor: "pointer" }}
+              >
                 Parolni unutdingizmi? Ustozingizga Ayting!
               </span>
             </div>
@@ -210,8 +265,10 @@ const Login = () => {
 
           <p style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
             Hisobingiz yo'qmi?{" "}
-            <span style={{ color: "#4f46e5", cursor: "pointer", fontWeight: 500 }}>
-             Ustozingizga Ayting!
+            <span
+              style={{ color: "#4f46e5", cursor: "pointer", fontWeight: 500 }}
+            >
+              Ustozingizga Ayting!
             </span>
           </p>
         </div>

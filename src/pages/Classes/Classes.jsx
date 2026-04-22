@@ -1,68 +1,181 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Loader from "../../components/Loader"; // O'sha biz yaratgan Loader
+import { Plus, Search, Users, BookOpen, X } from "lucide-react";
 
 const Classes = () => {
-  const myClasses = [
-    { id: 1, name: "10-A", sub: "10-sinf", students: 5, avg: 8.5, yellow: 1, red: 0 },
-    { id: 2, name: "10-B", sub: "10-sinf", students: 2, avg: 7.8, yellow: 2, red: 1 },
-    { id: 3, name: "11-A", sub: "11-sinf", students: 1, avg: 9.1, yellow: 0, red: 0 },
-  ];
+  const navigate = useNavigate();
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [userRole, setUserRole] = useState("");
+  
+  // States for Adding a Student
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [studentName, setStudentName] = useState("");
+
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    // "tyutor" yoki boshqa rollarni kichik harfga o'tkazib tekshiramiz
+    const role = savedUser.role?.toLowerCase() || "";
+    setUserRole(role);
+    fetchClasses();
+  }, []);
+
+  const fetchClasses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return navigate("/login");
+      
+      const res = await axios.get("https://pdp-system-backend-1.onrender.com/api/v1/classes", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      const fetchedData = res.data?.data || res.data || [];
+      setClasses(Array.isArray(fetchedData) ? fetchedData : []);
+    } catch (err) {
+            console.log(err.message);
+
+      toast.error("Sinflarni yuklashda xatolik");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    if (!studentName.trim()) return toast.warn("Ismni kiriting");
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `https://pdp-system-backend-1.onrender.com/api/v1/classes/${selectedClassId}/students`,
+        { name: studentName },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("O'quvchi muvaffaqiyatli qo'shildi!");
+      setIsModalOpen(false);
+      setStudentName("");
+      fetchClasses(); // Ro'yxatni yangilash
+    } catch (err) {
+      console.log(err.message);
+      
+      toast.error("O'quvchi qo'shishda xatolik yuz berdi");
+    }
+  };
+
+  const canManage = userRole === "teacher" || userRole === "admin" || userRole === "tyutor";
+
+  const filtered = classes.filter(c =>
+    (c.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Sizning CSS-ingizga mos Loader
+  if (loading) return <Loader />;
 
   return (
-    <div className="p-8 bg-[#F8FAFF] min-h-screen">
-      <h1 className="text-3xl font-bold text-slate-900 mb-1">Sinflar</h1>
-      <p className="text-slate-500 mb-8">Sizga biriktirilgan sinflar</p>
+    <div className="p-4 md:p-8 bg-[#F8FAFC] min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Sinflar</h1>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {myClasses.map((cls) => (
-          <div key={cls.id} className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
-            {/* Top Row */}
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800">{cls.name}</h2>
-                <p className="text-xs text-slate-400 font-semibold">{cls.sub}</p>
-              </div>
-              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                </svg>
-              </div>
-            </div>
+        {/* Search Bar - Better CSS Style */}
+        <div className="relative mb-10">
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={22} />
+          <input
+            type="text"
+            placeholder="Sinf qidirish..."
+            className="w-full bg-white border border-slate-100 rounded-[28px] py-5 pl-16 pr-8 outline-none focus:ring-4 focus:ring-indigo-500/5 font-semibold shadow-sm transition-all"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-            {/* Stats */}
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">O'quvchilar soni</span>
-                <span className="font-bold text-slate-800">{cls.students}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">O'rtacha ball</span>
-                <span className="font-bold text-slate-800">{cls.avg}</span>
-              </div>
-            </div>
-
-            <div className="h-px bg-gray-100 mb-4" />
-
-            {/* Warnings Section */}
-            <div className="flex gap-4">
-              {cls.yellow > 0 && (
-                <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.008v.008H12v-.008Z" />
-                  </svg>
-                  {cls.yellow} sariq
+        {/* Classes Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filtered.length > 0 ? (
+            filtered.map((item) => (
+              <div
+                key={item._id}
+                className="bg-white border border-slate-50 rounded-[40px] p-8 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group flex flex-col justify-between"
+              >
+                <div 
+                  onClick={() => navigate(`/home/classes/${item._id}`)} 
+                  className="cursor-pointer"
+                >
+                  <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600">
+                    <BookOpen size={24} />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{item.name}</h3>
+                  <div className="flex items-center gap-2 text-slate-400 font-bold mt-4">
+                    <Users size={18} className="text-indigo-300" /> 
+                    <span>{item.students?.length || 0} o'quvchi</span>
+                  </div>
                 </div>
-              )}
-              {cls.red > 0 && (
-                <div className="flex items-center gap-1 text-red-500 text-xs font-bold">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                  </svg>
-                  {cls.red} qizil
+
+                {canManage && (
+                  <button
+                    onClick={() => {
+                      setSelectedClassId(item._id);
+                      setIsModalOpen(true);
+                    }}
+                    className="mt-8 w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-indigo-600 hover:text-white text-indigo-600 py-4 rounded-[20px] font-black transition-all active:scale-95"
+                  >
+                    <Plus size={18} /> O'quvchi qo'shish
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-20">
+              <p className="text-slate-300 font-black uppercase tracking-widest">Sinf topilmadi</p>
+            </div>
+          )}
+        </div>
+
+        {/* --- ADD STUDENT MODAL --- */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-md rounded-4xl p-8 shadow-2xl scale-in-center">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-black text-slate-800">Yangi o'quvchi</h2>
+                <button 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-400 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <form onSubmit={handleAddStudent}>
+                <div className="mb-8">
+                  <label className="block text-slate-400 font-bold text-xs uppercase tracking-widest mb-3 pl-1">O'quvchi To'liq Ismi</label>
+                  <input
+                    required
+                    type="text"
+                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-100 rounded-2xl p-5 outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300"
+                    placeholder="Masalan: Alisher Karimov"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    autoFocus
+                  />
                 </div>
-              )}
+                
+                <button
+                  type="submit"
+                  className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                >
+                  Tizimga qo'shish
+                </button>
+              </form>
             </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

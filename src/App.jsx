@@ -8,6 +8,8 @@ import Login from "./pages/Login/Login";
 import LandingPage from "./pages/LandingPage/LandingPage"; 
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Classes from "./pages/Classes/Classes";
+import ClassDetail from "./pages/Classes/ClassDetail";
+import CreateClass from "./pages/Classes/CreateClass";
 import History from "./pages/History/History";
 import Profile from "./pages/Profile/Profile";
 import Statistics from "./pages/Statistics/Statistics";

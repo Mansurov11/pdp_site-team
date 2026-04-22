@@ -1,7 +1,7 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axios from "axios";
 import Pdp from "../../assets/pdp.png";
 
 const Login = () => {
@@ -10,50 +10,55 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    login(email, password);
-  };
+  const isDesktop = window.innerWidth >= 1024;
 
-  async function login(email, password) {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    // Basic Validation
+    if (!email || !password) {
+      return toast.error("Iltimos, barcha maydonlarni to'ldiring");
+    }
+
     try {
       setLoading(true);
+      
       const res = await axios.post(
-        `https://pdp-system-backend-1.onrender.com/api/v1/auth/login`,
-        { email, password },
+        "https://pdp-system-backend-1.onrender.com/api/v1/auth/login",
+        { email, password }
       );
 
+      // Destructuring the response based on your API structure
       const { accessToken, user } = res.data.data;
 
+      // Check for Authorized Roles
       if (user.role === "teacher" || user.role === "admin") {
-        toast.success("Muvaffaqiyatli kirildi!");
+        // Save to LocalStorage
         localStorage.setItem("token", accessToken);
         localStorage.setItem("password", password);
         localStorage.setItem("user", JSON.stringify(user));
+
+        toast.success(`Xush kelibsiz, ${user.fullName || "Ustoz"}!`);
+        
+        // Redirect to the home/dashboard
         navigate("/home");
       } else {
-        toast.warning("Siz admin emassiz!");
+        // Handle students or unauthorized roles
+        toast.warning("Sizda ushbu tizimga kirish huquqi yo'q!");
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
+      console.error("Login error:", err);
+      const errorMessage = err.response?.data?.message || "Login yoki parol noto'g'ri";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
-  }
-
-
-  const isDesktop = window.innerWidth >= 1024;
+  };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        width: "100%",
-        overflow: "hidden",
-      }}
-    >
-      {/* ── Left Panel — EXACT ORIGINAL STYLES ── */}
+    <div style={{ display: "flex", minHeight: "100vh", width: "100%", overflow: "hidden", fontFamily: "sans-serif" }}>
+      
+      {/* ── Left Panel (Desktop Only) ── */}
       {isDesktop && (
         <div
           style={{
@@ -70,7 +75,7 @@ const Login = () => {
             flexShrink: 0,
           }}
         >
-          {/* Diagonal shimmer restored */}
+          {/* Decorative Shimmer Overlay */}
           <div
             style={{
               position: "absolute",
@@ -81,15 +86,8 @@ const Login = () => {
             }}
           />
 
-          {/* Logo + Quote column restored */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "32px",
-              zIndex: 10,
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: "32px", zIndex: 10 }}>
+            {/* Logo Section */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div
                 style={{
@@ -104,171 +102,150 @@ const Login = () => {
                   flexShrink: 0,
                 }}
               >
-                <img src={Pdp} alt="" />
+                <img src={Pdp} alt="PDP Logo" style={{ width: "80%" }} />
               </div>
               <div>
-                <div
-                  style={{
-                    color: "white",
-                    fontWeight: 700,
-                    fontSize: 20,
-                    lineHeight: 1.2,
-                  }}
-                >
+                <div style={{ color: "white", fontWeight: 800, fontSize: 22, lineHeight: 1.2, letterSpacing: "-0.02em" }}>
                   PDP School
                 </div>
-                <div style={{ color: "#a5b4fc", fontSize: 13 }}>
-                  O'quvchi Etikasi Indeksi
-                </div>
+                <div style={{ color: "#a5b4fc", fontSize: 13, fontWeight: 600 }}>O'quvchi Etikasi Indeksi</div>
               </div>
             </div>
 
+            {/* Motivational Text */}
             <div>
-              <p
-                style={{
-                  color: "white",
-                  fontSize: 22,
-                  fontWeight: 600,
-                  lineHeight: 1.4,
-                  marginBottom: 8,
-                }}
-              >
-                "Tartib va intizom - muvaffaqiyatning kaliti"
+              <p style={{ color: "white", fontSize: 24, fontWeight: 700, lineHeight: 1.4, marginBottom: 8, letterSpacing: "-0.01em" }}>
+                "Tartib va intizom — muvaffaqiyatning kaliti"
               </p>
-              <p style={{ color: "#a5b4fc", fontSize: 13 }}>- PDP School</p>
+              <p style={{ color: "#a5b4fc", fontSize: 14, fontWeight: 600 }}>- PDP School Management</p>
             </div>
           </div>
 
-          <p style={{ color: "#a5b4fc", fontSize: 12, zIndex: 10 }}>
+          <p style={{ color: "#a5b4fc", fontSize: 12, zIndex: 10, fontWeight: 500 }}>
             © 2026 PDP School. Barcha huquqlar himoyalangan.
           </p>
         </div>
       )}
 
-      {/* ── Right Panel — EXACT ORIGINAL STYLES ── */}
+      {/* ── Right Panel (Login Form) ── */}
       <div
         style={{
           flex: 1,
           minHeight: "100vh",
-          background: "white",
+          background: "#ffffff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           padding: "48px 24px",
-          width: isDesktop ? "auto" : "100%",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 440 }}>
-          <h2
-            style={{
-              fontSize: 30,
-              fontWeight: 700,
-              color: "#111827",
-              marginBottom: 4,
-            }}
-          >
+        <div style={{ width: "100%", maxWidth: 420 }}>
+          <h2 style={{ fontSize: 32, fontWeight: 800, color: "#111827", marginBottom: 6, letterSpacing: "-0.03em" }}>
             Xush kelibsiz
           </h2>
-          <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 32 }}>
-            Davom etish uchun hisobingizga kiring
+          <p style={{ color: "#64748b", fontSize: 15, marginBottom: 40, fontWeight: 500 }}>
+            Tizimga kirish uchun ma'lumotlaringizni kiriting
           </p>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLogin}>
+            {/* Email Field */}
             <div style={{ marginBottom: 20 }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#374151",
-                  marginBottom: 6,
-                }}
-              >
-                Email
+              <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                Email Manzili
               </label>
               <input
                 type="email"
-                placeholder="email@pdp.uz"
+                required
+                placeholder="name@pdp.uz"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: "100%",
-                  padding: "12px 16px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  fontSize: 14,
-                  color: "#1f2937",
+                  padding: "14px 18px",
+                  border: "2px solid #f1f5f9",
+                  borderRadius: 14,
+                  fontSize: 15,
+                  color: "#1e293b",
                   outline: "none",
-                  boxSizing: "border-box",
+                  backgroundColor: "#f8fafc",
+                  transition: "border-color 0.2s",
+                  boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#6366f1"}
+                onBlur={(e) => e.target.style.borderColor = "#f1f5f9"}
               />
             </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#374151",
-                  marginBottom: 6,
-                }}
-              >
+            {/* Password Field */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Parol
               </label>
               <input
                 type="password"
+                required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
                   width: "100%",
-                  padding: "12px 16px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  fontSize: 14,
-                  color: "#1f2937",
+                  padding: "14px 18px",
+                  border: "2px solid #f1f5f9",
+                  borderRadius: 14,
+                  fontSize: 15,
+                  color: "#1e293b",
                   outline: "none",
-                  boxSizing: "border-box",
+                  backgroundColor: "#f8fafc",
+                  transition: "border-color 0.2s",
+                  boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#6366f1"}
+                onBlur={(e) => e.target.style.borderColor = "#f1f5f9"}
               />
             </div>
 
-            <div style={{ marginBottom: 24 }}>
-              <span
-                style={{ color: "#4f46e5", fontSize: 14, cursor: "pointer" }}
+            {/* Forgot Password Link */}
+            <div style={{ marginBottom: 32, textAlign: "right" }}>
+              <span 
+                style={{ color: "#6366f1", fontSize: 14, cursor: "pointer", fontWeight: 700 }}
+                onClick={() => toast.info("Parolni tiklash uchun adminstratsiyaga murojaat qiling")}
               >
-                Parolni unutdingizmi? Ustozingizga Ayting!
+                Parolni unutdingizmi?
               </span>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
               style={{
                 width: "100%",
-                padding: "14px",
-                borderRadius: 12,
+                padding: "16px",
+                borderRadius: 14,
                 border: "none",
-                background: "linear-gradient(90deg, #4f46e5, #4338ca)",
+                background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
                 color: "white",
-                fontWeight: 600,
+                fontWeight: 700,
                 fontSize: 16,
                 cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                marginBottom: 20,
+                boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)",
+                transition: "transform 0.1s, opacity 0.2s",
+                marginBottom: 24
               }}
+              onMouseEnter={(e) => !loading && (e.target.style.opacity = "0.9")}
+              onMouseLeave={(e) => !loading && (e.target.style.opacity = "1")}
+              onMouseDown={(e) => !loading && (e.target.style.transform = "scale(0.98)")}
+              onMouseUp={(e) => !loading && (e.target.style.transform = "scale(1)")}
             >
-              {loading ? "Kirilmoqda..." : "Kirish"}
+              {loading ? "Kirilmoqda..." : "Tizimga kirish"}
             </button>
           </form>
 
-          <p style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
+          {/* Bottom Help Text */}
+          <p style={{ textAlign: "center", fontSize: 14, color: "#64748b", fontWeight: 500 }}>
             Hisobingiz yo'qmi?{" "}
-            <span
-              style={{ color: "#4f46e5", cursor: "pointer", fontWeight: 500 }}
-            >
-              Ustozingizga Ayting!
+            <span style={{ color: "#6366f1", cursor: "pointer", fontWeight: 700 }}>
+               Ustozingizga ayting!
             </span>
           </p>
         </div>

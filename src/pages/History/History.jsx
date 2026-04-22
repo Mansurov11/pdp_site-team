@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Loader from "../../components/Loader"; // O'sha biz yaratgan Loader
 import "./History.css";
 import {
   Undo2,
@@ -77,12 +78,7 @@ const Students = () => {
     XLSX.writeFile(workbook, `Tarix_${new Date().toLocaleDateString()}.xlsx`);
   };
 
-  if (loading)
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-      </div>
-    );
+   if (loading) return <Loader />
 
   return (
     <main className="min-h-screen bg-[#F8F9FB] p-6 font-sans antialiased text-[#2D3139]">
@@ -285,7 +281,7 @@ function StatCard({ icon, color, label, value, unit }) {
 function Modal({ data, setOpenModal }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1D23]/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-2xl">
+      <div className="w-full max-w-md bg-white p-8 rounded-4xl shadow-2xl">
         <div className="mb-6 flex items-center justify-between">
           <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500">
             <Search size={24} />

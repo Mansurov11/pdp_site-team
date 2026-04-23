@@ -82,7 +82,7 @@ const Statistics = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Weekly Activity Chart */}
-        <div className="xl:col-span-2 bg-white border border-slate-100 rounded-[24px] p-8 shadow-sm">
+        <div className="xl:col-span-2 bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
           <h3 className="text-base font-bold text-slate-800 mb-12 uppercase tracking-wide">Haftalik faollik</h3>
           
           <div className="relative flex h-72 w-full border-b border-slate-100 ml-6 pr-4">
@@ -131,7 +131,7 @@ const Statistics = () => {
         </div>
 
         {/* Recent Activities */}
-        <div className="bg-white border border-slate-100 rounded-[24px] p-8 shadow-sm">
+        <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
           <h3 className="text-base font-bold text-slate-800 mb-8 uppercase tracking-wide">So'nggi amallar</h3>
           <div className="space-y-6">
             {data.activities.length > 0 ? data.activities.slice(0, 5).map((act, i) => (

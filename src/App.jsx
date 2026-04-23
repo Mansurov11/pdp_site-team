@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 import Layout from "./pages/Layout/Layout";
 import Login from "./pages/Login/Login";
-import LandingPage from "./pages/LandingPage/LandingPage"; 
+import LandingPage from "./pages/LandingPage/LandingPage";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Classes from "./pages/Classes/Classes";
 import ClassDetail from "./pages/Classes/ClassDetail";
@@ -15,7 +15,6 @@ import Profile from "./pages/Profile/Profile";
 import Statistics from "./pages/Statistics/Statistics";
 import { ToastContainer } from "react-toastify";
 
-
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" replace />;
@@ -24,12 +23,10 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const router = createBrowserRouter([
     {
-
       path: "/",
       element: <LandingPage />,
     },
     {
-
       path: "/login",
       element: <Login />,
     },
@@ -43,15 +40,11 @@ function App() {
       children: [
         {
           index: true,
-          element: <Dashboard />,
+          element: <Navigate to={"dashboard"} />,
         },
         {
           path: "dashboard",
           element: <Dashboard />,
-        },
-        {
-          path: "classes",
-          element: <Classes />,
         },
         {
           path: "history",
@@ -65,10 +58,17 @@ function App() {
           path: "profile",
           element: <Profile />,
         },
+                {
+          path: "classes",
+          element: <Classes />,
+        },
+        {
+          path: "classes/:id", // ":" dan oldin "/" bo'lishi shart va bu ClassDetail uchun
+          element: <ClassDetail />,
+        },
       ],
     },
     {
-
       path: "*",
       element: <Navigate to="/" replace />,
     },

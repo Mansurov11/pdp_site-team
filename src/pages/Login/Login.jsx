@@ -32,7 +32,7 @@ const Login = () => {
       const { accessToken, user } = res.data.data;
 
       // Check for Authorized Roles
-      if (user.role === "teacher" || user.role === "admin") {
+      if (user.role == "teacher" || user.role === "admin") {
         // Save to LocalStorage
         localStorage.setItem("token", accessToken);
         localStorage.setItem("password", password);
@@ -54,6 +54,8 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  // 69e0d9e520f198b345977645
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", width: "100%", overflow: "hidden", fontFamily: "sans-serif" }}>

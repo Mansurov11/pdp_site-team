@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ArrowLeft, Users, UserPlus, GraduationCap, X, Mail, User } from "lucide-react";
+import Loader from "../../components/Loader";
 
 const ClassDetail = () => {
   const { id } = useParams();
@@ -53,6 +54,7 @@ const ClassDetail = () => {
 
       await axios.post(
         `https://pdp-system-backend-1.onrender.com/api/v1/classes/${id}/students`,
+
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -70,7 +72,7 @@ const ClassDetail = () => {
     }
   };
 
-  if (loading) return <div className="p-20 text-center font-black animate-pulse text-slate-400">Yuklanmoqda...</div>;
+  if (loading) return <Loader />;
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -105,7 +107,7 @@ const ClassDetail = () => {
       <div className="grid grid-cols-1 gap-4">
         {classData?.students && classData.students.length > 0 ? (
           classData.students.map((student, index) => (
-            <div key={student._id || index} className="bg-white p-6 rounded-[24px] border border-slate-50 flex items-center justify-between group hover:border-indigo-100 transition-all">
+            <div key={student._id || index} className="bg-white p-6 rounded-3xl border border-slate-50 flex items-center justify-between group hover:border-indigo-100 transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center font-black text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all text-sm">
                   {index + 1}
@@ -181,7 +183,7 @@ const ClassDetail = () => {
 
               <button 
                 type="submit"
-                className="w-full bg-indigo-600 text-white py-5 rounded-[24px] font-black text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 mt-4"
+                className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-black text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 mt-4"
               >
                 Sinfga qo'shish
               </button>

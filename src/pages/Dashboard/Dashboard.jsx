@@ -32,6 +32,7 @@ const Dashboard = () => {
 
   if (loading) return <Loader />;
 
+  const newLocal = "absolute left-1/2 -translate-x-1/2 -top-12 z-50 bg-slate-900 text-white p-2 rounded-lg text-[11px] font-bold whitespace-nowrap";
   return (
     <div className="w-full max-w-400 mx-auto p-4 md:p-8 bg-[#F8FAFC] min-h-screen">
       <div className="mb-8">
@@ -65,9 +66,9 @@ const Dashboard = () => {
             {chartData.map((bar, idx) => (
               <div key={idx} className="group relative flex-1 h-full flex flex-col items-center justify-end px-2" onMouseEnter={() => setHoveredBar(idx)} onMouseLeave={() => setHoveredBar(null)}>
                 <div className="absolute inset-0 bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl" />
-                <div className="bg-[#5b52f0] w-full max-w-10 rounded-t-lg relative z-10 transition-all duration-300" style={{ height: `${(bar.value / 3) * 100}%` }}>
-                  {hoveredBar === idx && (
-                    <div className="absolute left-1/2 -translate-x-1/2 -top-12 z-50 bg-slate-900 text-white p-2 rounded-lg text-[11px] font-bold whitespace-nowrap">
+                <div className="bg-[#5b52f0] w-full max-w-45 rounded-t-lg relative z-10 transition-all duration-300" style={{ height: `${(bar.value / 3) * 100}%` }}>
+                  {hoveredBar == idx && (
+                    <div className={newLocal}>
                       ballar: {bar.value}
                     </div>
                   )}

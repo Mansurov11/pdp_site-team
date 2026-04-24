@@ -1,196 +1,119 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ArrowLeft, Users, UserPlus, GraduationCap, X, Mail, User } from "lucide-react";
+import { X, UserPlus } from "lucide-react";
 
-const ClassDetail = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  
-  const [classData, setClassData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  
-  // Modal & Input States
+const AddStudentModal = ({ classId, refreshData }) => {
+  // 1. State-lar (Siz taqdim etgan qismlar)
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [formData, setFormData] = useState({ name: "", surname: "", email: "" });
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchClassDetail();
-  }, [id]);
+  // 2. Formani tozalash funksiyasi
+  const resetForm = () => {
+    setFormData({ name: "", surname: "", email: "" });
+    setIsModalOpen(false);
+  };
 
-  const fetchClassDetail = async () => {
+  // 3. Ma'lumotlarni yuborish (POST)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`https://pdp-system-backend-1.onrender.com/api/v1/classes/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // Handle different API response structures
-      setClassData(res.data?.data || res.data);
+      // Eslatma: Agar 404 xatosi chiqsa, backenddagi URLni qayta tekshiring
+      await axios.post(
+        `https://pdp-system-backend-1.onrender.com/api/v1/classes/${classId}/students`,
+        { ...formData, role: "student" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success("O'quvchi muvaffaqiyatli qo'shildi!");
+      refreshData(); // Ro'yxatni yangilash
+      resetForm();
     } catch (err) {
-      console.log(err.message);
+      console.log(err);
       
-      toast.error("Sinf ma'lumotlarini yuklashda xatolik");
+      toast.error(err.response?.data?.message || "O'quvchi qo'shishda xatolik");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddStudent = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-
-      // Payload specifically for new user creation in this class
-      const payload = {
-        name: firstName,
-        surname: lastName,
-        email: email,
-        role: "student"
-      };
-
-      await axios.post(
-        `https://pdp-system-backend-1.onrender.com/api/v1/classes/${id}/students`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      toast.success("Yangi o'quvchi muvaffaqiyatli qo'shildi!");
-      
-      // Reset and Refresh
-      setIsModalOpen(false);
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      fetchClassDetail(); 
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Xatolik yuz berdi");
-    }
-  };
-
-  if (loading) return <div className="p-20 text-center font-black animate-pulse text-slate-400">Yuklanmoqda...</div>;
-
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 font-bold mb-8 hover:text-indigo-600 transition-all">
-        <ArrowLeft size={20} /> Orqaga
+    <>
+      {/* Modalni ochish tugmasi */}
+      <button 
+        onClick={() => setIsModalOpen(true)}
+        className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all"
+      >
+        <UserPlus size={20} /> O'quvchi qo'shish
       </button>
 
-      {/* Header Section */}
-      <div className="bg-white rounded-[40px] p-10 border border-slate-100 shadow-sm mb-10">
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="bg-indigo-50 text-indigo-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Sinf ma'lumotlari</span>
-            <h1 className="text-6xl font-black text-slate-900 mt-4">{classData?.name}</h1>
-            <div className="flex items-center gap-2 mt-6 text-slate-400 font-bold">
-              <Users size={20} /> <span>{classData?.students?.length || 0} o'quvchi ro'yxatda</span>
-            </div>
-          </div>
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="bg-indigo-600 text-white p-5 rounded-3xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
-          >
-            <UserPlus size={28} />
-          </button>
-        </div>
-      </div>
-
-      {/* Student List */}
-      <h2 className="text-3xl font-black text-slate-800 mb-6 flex items-center gap-3">
-        <GraduationCap size={32} className="text-indigo-600" /> O'quvchilar ro'yxati
-      </h2>
-
-      <div className="grid grid-cols-1 gap-4">
-        {classData?.students && classData.students.length > 0 ? (
-          classData.students.map((student, index) => (
-            <div key={student._id || index} className="bg-white p-6 rounded-[24px] border border-slate-50 flex items-center justify-between group hover:border-indigo-100 transition-all">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center font-black text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all text-sm">
-                  {index + 1}
-                </div>
-                <div>
-                  <p className="text-xl font-black text-slate-800">{student.name} {student.surname}</p>
-                  <p className="text-sm text-slate-400 font-bold flex items-center gap-1">
-                    <Mail size={14} /> {student.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="bg-slate-50/50 rounded-[40px] p-20 text-center border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 font-bold text-xl">Bu sinfda hali o'quvchilar yo'q.</p>
-          </div>
-        )}
-      </div>
-
-      {/* --- ADD NEW STUDENT MODAL --- */}
+      {/* Modal oynasi */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4">
-          <div className="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black text-slate-800">Yangi o'quvchi</h2>
-              <X className="cursor-pointer text-slate-400 hover:text-slate-800" onClick={() => setIsModalOpen(false)} size={32} />
+              <h2 className="text-2xl font-black text-slate-800">Yangi o'quvchi</h2>
+              <button onClick={resetForm} className="text-slate-400 hover:text-slate-600">
+                <X size={24} />
+              </button>
             </div>
 
-            <form onSubmit={handleAddStudent} className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ism</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <input 
-                    required
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
-                    placeholder="Ismni kiriting"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Ism kiritish */}
+              <div className="space-y-1">
+                <label className="text-sm font-bold text-slate-500 ml-2">Ism</label>
+                <input 
+                  required
+                  className="w-full p-4 bg-slate-50 rounded-2xl border border-transparent focus:border-indigo-500 focus:bg-white outline-none font-bold transition-all"
+                  placeholder="Masalan: Ali"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Familiya</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <input 
-                    required
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
-                    placeholder="Familiyani kiriting"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </div>
+              {/* Familiya kiritish */}
+              <div className="space-y-1">
+                <label className="text-sm font-bold text-slate-500 ml-2">Familiya</label>
+                <input 
+                  required
+                  className="w-full p-4 bg-slate-50 rounded-2xl border border-transparent focus:border-indigo-500 focus:bg-white outline-none font-bold transition-all"
+                  placeholder="Masalan: Valiyev"
+                  value={formData.surname}
+                  onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
+                />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <input 
-                    required
-                    type="email"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
-                    placeholder="example@pdp.uz"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+              {/* Email kiritish */}
+              <div className="space-y-1">
+                <label className="text-sm font-bold text-slate-500 ml-2">Email</label>
+                <input 
+                  required
+                  type="email"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border border-transparent focus:border-indigo-500 focus:bg-white outline-none font-bold transition-all"
+                  placeholder="ali@pdp.uz"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
               </div>
 
+              {/* Tasdiqlash tugmasi */}
               <button 
-                type="submit"
-                className="w-full bg-indigo-600 text-white py-5 rounded-[24px] font-black text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 mt-4"
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-700 disabled:bg-slate-300 transition-all mt-4"
               >
-                Sinfga qo'shish
+                {loading ? "Yuborilmoqda..." : "Tizimga qo'shish"}
               </button>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-export default ClassDetail;
+export default AddStudentModal;

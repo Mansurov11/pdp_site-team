@@ -14,7 +14,6 @@ const Profile = () => {
   // States
   const [passData, setPassData] = useState({ currentPassword: "", newPassword: "" });
   const [showPassword, setShowPassword] = useState({ current: false, new: false });
-  const [notifications, setNotifications] = useState({ email: true, reports: false });
 
   const API_BASE = "https://pdp-system-backend-1.onrender.com/api/v1";
   const token = localStorage.getItem("token");
@@ -154,13 +153,7 @@ const Profile = () => {
             </div>
           </Section>
 
-          <Section title="Bildirishnomalar" icon={<Bell size={20}/>}>
-            <div className="space-y-6 mt-4">
-              <ToggleRow title="Email xabarnomalar" active={notifications.email} onClick={() => setNotifications({...notifications, email: !notifications.email})} />
-              <ToggleRow title="Haftalik hisobotlar" active={notifications.reports} onClick={() => setNotifications({...notifications, reports: !notifications.reports})} />
-            </div>
-          </Section>
-
+       
           <Section title="Xavfsizlik" icon={<Lock size={20}/>}>
             <form onSubmit={handleResetPassword} className="space-y-5 mt-4">
               <Input 
@@ -183,27 +176,7 @@ const Profile = () => {
             </form>
           </Section>
 
-          <Section title="Tayinlangan sinflar" icon={<GraduationCap size={20}/>}>
-            <div className="space-y-3 mt-4">
-              {user?.classes?.length > 0 ? user.classes.map((cls, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-[#F9FBFF] border border-slate-50 group hover:border-indigo-100 transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center font-black text-indigo-300 shadow-sm">
-                      {cls.name.split(' ')[0]}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800 text-sm">{cls.name}</p>
-                      <p className="text-[10px] font-bold text-slate-300 uppercase">Matematika</p>
-                    </div>
-                  </div>
-                  <ChevronRight size={18} className="text-slate-200 group-hover:text-indigo-400 transition-all" />
-                </div>
-              )) : (
-                <p className="text-center text-slate-300 py-10 text-xs font-bold uppercase">Sinflar mavjud emas</p>
-              )}
-            </div>
-          </Section>
-
+ 
         </div>
       </div>
     </div>

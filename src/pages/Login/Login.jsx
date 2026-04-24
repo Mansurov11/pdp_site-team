@@ -35,6 +35,7 @@ const Login = () => {
       if (user.role === "teacher" || user.role === "admin") {
         // Save to LocalStorage
         localStorage.setItem("token", accessToken);
+        localStorage.setItem("password", password);
         localStorage.setItem("user", JSON.stringify(user));
 
         toast.success(`Xush kelibsiz, ${user.fullName || "Ustoz"}!`);
@@ -69,7 +70,8 @@ const Login = () => {
             padding: "40px",
             position: "relative",
             overflow: "hidden",
-            background: "linear-gradient(135deg, #5b52f0 0%, #4338ca 40%, #3730a3 100%)",
+            background:
+              "linear-gradient(135deg, #5b52f0 0%, #4338ca 40%, #3730a3 100%)",
             flexShrink: 0,
           }}
         >
@@ -80,7 +82,7 @@ const Login = () => {
               inset: 0,
               pointerEvents: "none",
               background: `linear-gradient(-132.5deg, #6366f1 50%, transparent 50%)`,
-              zIndex: 1
+              zIndex: 1,
             }}
           />
 

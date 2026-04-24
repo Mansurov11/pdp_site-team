@@ -2,183 +2,619 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Loader from "../../components/Loader"; // O'sha biz yaratgan Loader
-import { Plus, Search, Users, BookOpen, X } from "lucide-react";
+import Loader from "../../components/Loader";
+import { Plus, Search, Users, BookOpen, X, ShieldCheck, ChevronRight, GraduationCap } from "lucide-react";
 
 const Classes = () => {
   const navigate = useNavigate();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [userRole, setUserRole] = useState("");
-  
-  // States for Adding a Student
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState("");
-  const [studentName, setStudentName] = useState("");
+  const [selectedClassName, setSelectedClassName] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    surname: "",
+    email: "",
+    password: "password123",
+  });
 
   useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    // "tyutor" yoki boshqa rollarni kichik harfga o'tkazib tekshiramiz
-    const role = savedUser.role?.toLowerCase() || "";
-    setUserRole(role);
     fetchClasses();
   }, []);
 
   const fetchClasses = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return navigate("/login");
-      
-      const res = await axios.get("https://pdp-system-backend-1.onrender.com/api/v1/classes", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
+      const res = await axios.get(
+        "https://pdp-system-backend-1.onrender.com/api/v1/classes",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       const fetchedData = res.data?.data || res.data || [];
       setClasses(Array.isArray(fetchedData) ? fetchedData : []);
     } catch (err) {
-            console.log(err.message);
-
-      toast.error("Sinflarni yuklashda xatolik");
+      console.log(err.message);
+      toast.error("Sinflarni yuklashda xatolik yuz berdi");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddStudent = async (e) => {
+  const handleAdminCreateUser = async (e) => {
     e.preventDefault();
-    if (!studentName.trim()) return toast.warn("Ismni kiriting");
-
+    const token = localStorage.getItem("token");
+    const newUserPayload = {
+      name: formData.name,
+      surname: formData.surname,
+      email: formData.email,
+      password: formData.password,
+      role: "student",
+      classId: selectedClassId,
+    };
     try {
-      const token = localStorage.getItem("token");
       await axios.post(
-        `https://pdp-system-backend-1.onrender.com/api/v1/classes/${selectedClassId}/students`,
-        { name: studentName },
+        "https://pdp-system-backend-1.onrender.com/api/v1/users",
+        newUserPayload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      toast.success("O'quvchi muvaffaqiyatli qo'shildi!");
+      toast.success("Yangi o'quvchi muvaffaqiyatli yaratildi!");
       setIsModalOpen(false);
-      setStudentName("");
-      fetchClasses(); // Ro'yxatni yangilash
+      setFormData({ name: "", surname: "", email: "", password: "password123" });
+      fetchClasses();
     } catch (err) {
-      console.log(err.message);
-      
-      toast.error("O'quvchi qo'shishda xatolik yuz berdi");
+      console.error("Yaratishda xatolik:", err.response?.data);
+      toast.error(
+        err.response?.data?.message ||
+          "Foydalanuvchi yaratishda xatolik (404/400)"
+      );
     }
   };
 
-  const canManage = userRole === "teacher" || userRole === "admin" || userRole === "tyutor";
-
-  const filtered = classes.filter(c =>
+  const filteredClasses = classes.filter((c) =>
     (c.name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sizning CSS-ingizga mos Loader
+  const openModal = (classId, className) => {
+    setSelectedClassId(classId);
+    setSelectedClassName(className);
+    setIsModalOpen(true);
+  };
+
   if (loading) return <Loader />;
 
   return (
-    <div className="p-4 md:p-8 bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Sinflar</h1>
+    <div style={styles.page}>
+      {/* Header */}
+      <div style={styles.header}>
+        <div>
+          <p style={styles.headerEyebrow}>Boshqaruv paneli</p>
+          <h1 style={styles.headerTitle}>Sinflar</h1>
         </div>
+        <div style={styles.adminBadge}>
+          <ShieldCheck size={15} />
+          <span>Admin</span>
+        </div>
+      </div>
 
-        {/* Search Bar - Better CSS Style */}
-        <div className="relative mb-10">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={22} />
-          <input
-            type="text"
-            placeholder="Sinf qidirish..."
-            className="w-full bg-white border border-slate-100 rounded-[28px] py-5 pl-16 pr-8 outline-none focus:ring-4 focus:ring-indigo-500/5 font-semibold shadow-sm transition-all"
-            onChange={(e) => setSearchTerm(e.target.value)}
+      {/* Stats row */}
+      <div style={styles.statsRow}>
+        <div style={styles.statCard}>
+          <span style={styles.statValue}>{classes.length}</span>
+          <span style={styles.statLabel}>Jami sinflar</span>
+        </div>
+        <div style={styles.statCard}>
+          <span style={styles.statValue}>
+            {classes.reduce((acc, c) => acc + (c.students?.length || 0), 0)}
+          </span>
+          <span style={styles.statLabel}>Jami o'quvchilar</span>
+        </div>
+        <div style={styles.statCard}>
+          <span style={styles.statValue}>
+            {filteredClasses.length}
+          </span>
+          <span style={styles.statLabel}>Qidiruv natijalari</span>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div style={styles.searchWrapper}>
+        <Search size={16} style={styles.searchIcon} />
+        <input
+          type="text"
+          placeholder="Sinf nomini qidiring..."
+          style={styles.searchInput}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm && (
+          <button style={styles.clearBtn} onClick={() => setSearchTerm("")}>
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* Grid */}
+      {filteredClasses.length === 0 ? (
+        <div style={styles.emptyState}>
+          <GraduationCap size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
+          <p style={styles.emptyTitle}>Sinf topilmadi</p>
+          <p style={styles.emptySubtitle}>Qidiruv so'zini o'zgartiring</p>
+        </div>
+      ) : (
+        <div style={styles.grid}>
+          {filteredClasses.map((item, i) => (
+            <ClassCard
+              key={item._id}
+              item={item}
+              index={i}
+              onNavigate={() => navigate(`/home/classes/${item._id}`)}
+              onAddStudent={() => openModal(item._id, item.name)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div style={styles.overlay} onClick={() => setIsModalOpen(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div style={styles.modalHeader}>
+              <div>
+                <p style={styles.modalEyebrow}>Yangi o'quvchi</p>
+                <h2 style={styles.modalTitle}>{selectedClassName}</h2>
+              </div>
+              <button
+                style={styles.closeBtn}
+                onClick={() => setIsModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={styles.modalDivider} />
+
+            <form onSubmit={handleAdminCreateUser}>
+              <div style={styles.fieldGrid}>
+                <FormField
+                  placeholder="Ism"
+                  value={formData.name}
+                  onChange={(v) => setFormData({ ...formData, name: v })}
+                  required
+                />
+                <FormField
+                  placeholder="Familiya"
+                  value={formData.surname}
+                  onChange={(v) => setFormData({ ...formData, surname: v })}
+                  required
+                />
+              </div>
+              <FormField
+                placeholder="Email manzil"
+                type="email"
+                value={formData.email}
+                onChange={(v) => setFormData({ ...formData, email: v })}
+                required
+                full
+              />
+              <FormField
+                placeholder="Parol"
+                type="text"
+                value={formData.password}
+                onChange={(v) => setFormData({ ...formData, password: v })}
+                required
+                full
+              />
+
+              <div style={styles.classIdBox}>
+                <span style={styles.classIdLabel}>Sinf ID</span>
+                <span style={styles.classIdValue}>{selectedClassId}</span>
+              </div>
+
+              <button type="submit" style={styles.submitBtn}>
+                Tizimga qo'shish
+                <ChevronRight size={16} />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── Sub-components ───────────────────────────────────── */
+
+const CLASS_COLORS = [
+  { bg: "#EEF2FF", icon: "#4F46E5", text: "#3730A3" },
+  { bg: "#F0FDF4", icon: "#16A34A", text: "#15803D" },
+  { bg: "#FFF7ED", icon: "#EA580C", text: "#C2410C" },
+  { bg: "#FDF2F8", icon: "#A855F7", text: "#7E22CE" },
+  { bg: "#ECFEFF", icon: "#0891B2", text: "#0E7490" },
+];
+
+const ClassCard = ({ item, index, onNavigate, onAddStudent }) => {
+  const color = CLASS_COLORS[index % CLASS_COLORS.length];
+  const count = item.students?.length || 0;
+
+  return (
+    <div style={styles.card}>
+      {/* Top: icon + name */}
+      <div style={styles.cardTop} onClick={onNavigate}>
+        <div style={{ ...styles.cardIcon, backgroundColor: color.bg }}>
+          <BookOpen size={18} color={color.icon} />
+        </div>
+        <div style={styles.cardMeta}>
+          <h3 style={{ ...styles.cardName, color: color.text }}>{item.name}</h3>
+          <div style={styles.cardCount}>
+            <Users size={13} style={{ opacity: 0.4 }} />
+            <span>{count} o'quvchi</span>
+          </div>
+        </div>
+        <ChevronRight size={16} style={styles.cardChevron} />
+      </div>
+
+      {/* Bottom: progress bar + add button */}
+      <div style={styles.cardBottom}>
+        <div style={styles.progressTrack}>
+          <div
+            style={{
+              ...styles.progressFill,
+              width: `${Math.min((count / 30) * 100, 100)}%`,
+              backgroundColor: color.icon,
+            }}
           />
         </div>
-
-        {/* Classes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.length > 0 ? (
-            filtered.map((item) => (
-              <div
-                key={item._id}
-                className="bg-white border border-slate-50 rounded-[40px] p-8 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group flex flex-col justify-between"
-              >
-                <div 
-                  onClick={() => navigate(`/home/classes/${item._id}`)} 
-                  className="cursor-pointer"
-                >
-                  <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-200">
-                    <BookOpen size={24} />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{item.name}</h3>
-                  <div className="flex items-center gap-2 text-slate-400 font-bold mt-4">
-                    <Users size={18} className="text-indigo-300" /> 
-                    <span>{item.students?.length || 0} o'quvchi</span>
-                  </div>
-                </div>
-
-                {canManage && (
-                  <button
-                    onClick={() => {
-                      setSelectedClassId(item._id);
-                      setIsModalOpen(true);
-                    }}
-                    className="mt-8 w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-indigo-600 hover:text-white text-indigo-600 py-4 rounded-[20px] font-black transition-all active:scale-95"
-                  >
-                    <Plus size={18} /> O'quvchi qo'shish
-                  </button>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20">
-              <p className="text-slate-300 font-black uppercase tracking-widest">Sinf topilmadi</p>
-            </div>
-          )}
-        </div>
-
-        {/* --- ADD STUDENT MODAL --- */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl scale-in-center">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-black text-slate-800">Yangi o'quvchi</h2>
-                <button 
-                  onClick={() => setIsModalOpen(false)} 
-                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-400 transition-colors"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-              
-              <form onSubmit={handleAddStudent}>
-                <div className="mb-8">
-                  <label className="block text-slate-400 font-bold text-xs uppercase tracking-widest mb-3 pl-1">O'quvchi To'liq Ismi</label>
-                  <input
-                    required
-                    type="text"
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-100 rounded-2xl p-5 outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300"
-                    placeholder="Masalan: Alisher Karimov"
-                    value={studentName}
-                    onChange={(e) => setStudentName(e.target.value)}
-                    autoFocus
-                  />
-                </div>
-                
-                <button
-                  type="submit"
-                  className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all"
-                >
-                  Tizimga qo'shish
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
+        <button
+          style={{ ...styles.addBtn, color: color.icon, borderColor: color.bg }}
+          onClick={onAddStudent}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = color.bg;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }}
+        >
+          <Plus size={14} />
+          O'quvchi qo'shish
+        </button>
       </div>
     </div>
   );
+};
+
+const FormField = ({ placeholder, value, onChange, type = "text", required, full }) => (
+  <input
+    required={required}
+    type={type}
+    placeholder={placeholder}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    style={{ ...styles.input, ...(full ? { width: "100%", boxSizing: "border-box" } : {}) }}
+  />
+);
+
+/* ── Styles ───────────────────────────────────────────── */
+
+const styles = {
+  page: {
+    padding: "40px 48px",
+    minHeight: "100vh",
+    backgroundColor: "#F9FAFB",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 32,
+  },
+  headerEyebrow: {
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    color: "#9CA3AF",
+    margin: "0 0 4px",
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 700,
+    color: "#111827",
+    margin: 0,
+    letterSpacing: "-0.02em",
+  },
+  adminBadge: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    fontSize: 12,
+    fontWeight: 600,
+    color: "#4F46E5",
+    backgroundColor: "#EEF2FF",
+    padding: "6px 14px",
+    borderRadius: 999,
+  },
+  statsRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 16,
+    marginBottom: 28,
+  },
+  statCard: {
+    backgroundColor: "#fff",
+    border: "1px solid #F3F4F6",
+    borderRadius: 16,
+    padding: "16px 20px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+  },
+  statValue: {
+    fontSize: 26,
+    fontWeight: 700,
+    color: "#111827",
+    letterSpacing: "-0.02em",
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#9CA3AF",
+    fontWeight: 500,
+  },
+  searchWrapper: {
+    position: "relative",
+    marginBottom: 28,
+  },
+  searchIcon: {
+    position: "absolute",
+    left: 16,
+    top: "50%",
+    transform: "translateY(-50%)",
+    color: "#9CA3AF",
+    pointerEvents: "none",
+  },
+  searchInput: {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "14px 44px",
+    backgroundColor: "#fff",
+    border: "1px solid #E5E7EB",
+    borderRadius: 14,
+    fontSize: 14,
+    fontWeight: 500,
+    color: "#111827",
+    outline: "none",
+    transition: "border-color 0.15s",
+  },
+  clearBtn: {
+    position: "absolute",
+    right: 14,
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "#9CA3AF",
+    display: "flex",
+    alignItems: "center",
+    padding: 4,
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+    gap: 16,
+  },
+  emptyState: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "80px 0",
+    color: "#6B7280",
+  },
+  emptyTitle: { fontSize: 16, fontWeight: 600, margin: "0 0 4px" },
+  emptySubtitle: { fontSize: 14, color: "#9CA3AF", margin: 0 },
+
+  /* Card */
+  card: {
+    backgroundColor: "#fff",
+    border: "1px solid #F3F4F6",
+    borderRadius: 20,
+    overflow: "hidden",
+    transition: "box-shadow 0.2s",
+  },
+  cardTop: {
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    padding: "20px 20px 14px",
+    cursor: "pointer",
+  },
+  cardIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  cardMeta: { flex: 1, minWidth: 0 },
+  cardName: {
+    fontSize: 15,
+    fontWeight: 700,
+    margin: "0 0 3px",
+    letterSpacing: "-0.01em",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  cardCount: {
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
+    fontSize: 12,
+    color: "#9CA3AF",
+    fontWeight: 500,
+  },
+  cardChevron: { color: "#D1D5DB", flexShrink: 0 },
+  cardBottom: {
+    padding: "0 20px 18px",
+    borderTop: "1px solid #F9FAFB",
+    paddingTop: 14,
+  },
+  progressTrack: {
+    height: 4,
+    backgroundColor: "#F3F4F6",
+    borderRadius: 99,
+    marginBottom: 14,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 99,
+    transition: "width 0.4s ease",
+  },
+  addBtn: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    padding: "10px 0",
+    fontSize: 13,
+    fontWeight: 600,
+    border: "1.5px solid",
+    borderRadius: 12,
+    cursor: "pointer",
+    backgroundColor: "transparent",
+    transition: "background-color 0.15s",
+  },
+
+  /* Modal */
+  overlay: {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 50,
+    padding: 16,
+  },
+  modal: {
+    backgroundColor: "#fff",
+    borderRadius: 24,
+    padding: "28px 28px 24px",
+    width: "100%",
+    maxWidth: 440,
+    boxShadow: "0 24px 48px rgba(0,0,0,0.12)",
+  },
+  modalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 20,
+  },
+  modalEyebrow: {
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: "#9CA3AF",
+    margin: "0 0 4px",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 700,
+    color: "#111827",
+    margin: 0,
+    letterSpacing: "-0.02em",
+  },
+  closeBtn: {
+    background: "#F9FAFB",
+    border: "1px solid #E5E7EB",
+    borderRadius: 10,
+    width: 36,
+    height: 36,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    color: "#6B7280",
+    flexShrink: 0,
+  },
+  modalDivider: {
+    height: 1,
+    backgroundColor: "#F3F4F6",
+    marginBottom: 20,
+  },
+  fieldGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 10,
+    marginBottom: 10,
+  },
+  input: {
+    padding: "12px 14px",
+    backgroundColor: "#F9FAFB",
+    border: "1px solid #E5E7EB",
+    borderRadius: 12,
+    fontSize: 14,
+    fontWeight: 500,
+    color: "#111827",
+    outline: "none",
+    marginBottom: 10,
+    display: "block",
+  },
+  classIdBox: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#F9FAFB",
+    border: "1px solid #E5E7EB",
+    borderRadius: 12,
+    padding: "10px 14px",
+    marginBottom: 18,
+    marginTop: 4,
+  },
+  classIdLabel: {
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#9CA3AF",
+  },
+  classIdValue: {
+    fontSize: 11,
+    fontFamily: "monospace",
+    color: "#4F46E5",
+    fontWeight: 600,
+    maxWidth: 200,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  submitBtn: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: "14px 0",
+    backgroundColor: "#4F46E5",
+    color: "#fff",
+    border: "none",
+    borderRadius: 14,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: "pointer",
+    letterSpacing: "-0.01em",
+  },
 };
 
 export default Classes;

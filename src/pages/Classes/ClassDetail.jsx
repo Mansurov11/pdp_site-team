@@ -10,6 +10,7 @@ import {
   X,
   Mail,
   User,
+  PlusSquareIcon,
 } from "lucide-react";
 import Loader from "../../components/Loader";
 
@@ -17,7 +18,7 @@ const ClassDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [classData, setClassData] = useState(null);
+  const [classData, setClassData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Modal & Input States
@@ -35,12 +36,14 @@ const ClassDetail = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://pdp-system-backend-1.onrender.com/api/v1/classes/${id}`,
+        `https://pdp-system-backend-1.onrender.com/api/v1/scores/class/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setClassData(res.data?.data || res.data);
+
+      setClassData(res.data?.data || []);
+      console.log(res.data?.data);
     } catch (err) {
       console.error(err.message);
       toast.error("Sinf ma'lumotlarini yuklashda xatolik");
@@ -67,21 +70,40 @@ const ClassDetail = () => {
 
       toast.success("Yangi o'quvchi muvaffaqiyatli qo'shildi!");
 
-      // Modalni yopish va ma'lumotlarni yangilash
       setIsModalOpen(false);
       setFirstName("");
       setLastName("");
       setEmail("");
-      fetchClassDetail(); // Ro'yxatni qayta yuklash
+      fetchClassDetail();
     } catch (err) {
       toast.error(err.response?.data?.message || "Xatolik yuz berdi");
     }
   };
 
+
+  const getStatus = (score) => {
+    if (score <= 4) {
+      return {
+        text: "Sariq ro'yhat",
+        className: "bg-yellow-100 font-bold text-orange-600",
+      };
+    }
+    if (score <= 6) {
+      return {
+        text: "Ogohlantirish",
+        className: "bg-yellow-100 font-bold text-yellow-500",
+      };
+    }
+    return {
+      text: "Normal",
+      className: "bg-green-100 font-bold text-green-600",
+    };
+  };
+
   if (loading) return <Loader />;
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-8xl p-6">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-slate-500 font-bold mb-8 hover:text-indigo-600 transition-all"
@@ -97,11 +119,11 @@ const ClassDetail = () => {
               Sinf ma'lumotlari
             </span>
             <h1 className="text-6xl font-black text-slate-900 mt-4">
-              {classData?.name}
+              {/* If backend doesn't return class name, leave empty */}
             </h1>
             <div className="flex items-center gap-2 mt-6 text-slate-400 font-bold">
-              <Users size={20} />{" "}
-              <span>{classData?.students?.length || 0} o'quvchi ro'yxatda</span>
+              <Users size={20} />
+              <span>{classData.length} o'quvchi ro'yxatda</span>
             </div>
           </div>
           <button
@@ -113,17 +135,19 @@ const ClassDetail = () => {
         </div>
       </div>
 
-      {/* Student List */}
+
       <h2 className="text-3xl font-black text-slate-800 mb-6 flex items-center gap-3">
         <GraduationCap size={32} className="text-indigo-600" /> O'quvchilar ro'yxati
       </h2>
 
       <div className="grid grid-cols-1 gap-4">
-        {classData?.students && classData.students.length > 0 ? (
-          classData.students.map((student, index) => (
+        {classData.map((student, index) => {
+          const status = getStatus(student.disciplineScore);
+
+          return (
             <div
               key={student._id || index}
-              className="bg-white p-6 rounded-3xl border border-slate-50 flex items-center justify-between group hover:border-indigo-100 transition-all"
+              className="bg-white p-6 rounded-3xl border border-slate-50 flex items-center justify-between gap-1  group hover:border-indigo-100 transition-all"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center font-black text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all text-sm">
@@ -131,30 +155,61 @@ const ClassDetail = () => {
                 </div>
                 <div>
                   <p className="text-xl font-black text-slate-800">
-                    {student.name} {student.surname}
+                    {student.studentId?.fullName}
                   </p>
                   <p className="text-sm text-slate-400 font-bold flex items-center gap-1">
-                    <Mail size={14} /> {student.email}
+                    <Mail size={14} /> {student.studentId?.email}
                   </p>
                 </div>
               </div>
+
+              <div className="flex g1">
+                <p className="text-3xl text-black font-bold flex items-center gap-1">
+                  {student.disciplineScore}
+                </p>
+                <p className="text-xl text-slate-400 font-bold flex items-end gap-1">
+                  /10
+                </p>
+              </div>
+
+              <p className="text-3xl text-blue-400 font-semibold flex items-center gap-1">
+                + {student.rewardScore}
+              </p>
+
+              <span
+                className={`f1 rounded-full m-0 px-4 py-1 ${status.className}`}
+              >
+                {status.text}
+              </span>
+
+             <div className="flex items-center gap-2">
+  <button
+    type="button"
+    className="bg-green-300 text-green-600 w-10 h-10 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm hover:bg-green-400 active:scale-95 transition-all"
+  >
+    +
+  </button>
+
+  <button
+    type="button"
+    className="bg-red-300 text-red-600 w-10 h-10 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm hover:bg-red-400 active:scale-95 transition-all"
+  >
+    −
+  </button>
+</div>
             </div>
-          ))
-        ) : (
-          <div className="bg-slate-50/50 rounded-[40px] p-20 text-center border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 font-bold text-xl">
-              Bu sinfda hali o'quvchilar yo'q.
-            </p>
-          </div>
-        )}
+          );
+        })}
       </div>
 
-      {/* --- ADD NEW STUDENT MODAL --- */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-100 p-4">
           <div className="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black text-slate-800">Yangi o'quvchi</h2>
+              <h2 className="text-3xl font-black text-slate-800">
+                Yangi o'quvchi
+              </h2>
               <X
                 className="cursor-pointer text-slate-400 hover:text-slate-800"
                 onClick={() => setIsModalOpen(false)}
@@ -164,9 +219,14 @@ const ClassDetail = () => {
 
             <form onSubmit={handleAddStudent} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ism</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                  Ism
+                </label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                  <User
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
+                    size={18}
+                  />
                   <input
                     required
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
@@ -178,9 +238,14 @@ const ClassDetail = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Familiya</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                  Familiya
+                </label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                  <User
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
+                    size={18}
+                  />
                   <input
                     required
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
@@ -192,9 +257,14 @@ const ClassDetail = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                  Email
+                </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                  <Mail
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
+                    size={18}
+                  />
                   <input
                     required
                     type="email"
@@ -208,7 +278,7 @@ const ClassDetail = () => {
 
               <button
                 type="submit"
-                className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-black text-xl s`hadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 mt-4"
+                className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-black text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 mt-4"
               >
                 Sinfga qo'shish
               </button>

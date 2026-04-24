@@ -150,7 +150,7 @@ const Profile = () => {
           <div className="p-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
               <div className="relative group">
-                <div className="w-32 h-32 bg-[#F0F4FF] rounded-[40px] flex items-center justify-center text-4xl font-black text-[#818CF8] uppercase overflow-hidden shadow-inner">
+                <div className="w-32 h-32 bg-[#F0F4FF] rounded-3xl flex items-center justify-center text-4xl font-black text-[#818CF8] uppercase overflow-hidden shadow-inner">
                   {user?.avatar ? (
                     <img
                       src={user.avatar}
@@ -164,7 +164,7 @@ const Profile = () => {
                       .join("")
                   )}
                 </div>
-                <label className="absolute -bottom-2 -right-2 p-3 bg-[#6366F1] text-white rounded-2xl border-4 border-white shadow-md cursor-pointer">
+                <label className="absolute -bottom-2 -right-2 p-3 bg-[#6366F1] text-white rounded-full border-4 cursor-pointer">
                   <Camera size={18} />
                   <input
                     type="file"

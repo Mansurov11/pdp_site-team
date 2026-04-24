@@ -56,8 +56,7 @@ const ClassDetail = () => {
     e.preventDefault();
     try {
       const payload = {
-        name: firstName,
-        surname: lastName,
+        fullName: firstName,
         email: email,
         role: "student",
       };

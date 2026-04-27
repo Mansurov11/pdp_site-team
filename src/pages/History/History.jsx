@@ -22,6 +22,9 @@ const Students = () => {
   const [openModal, setOpenModal] = useState(false);
   const [activeTransaction, setActiveTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+  
+  
 
   async function getId() {
     try {
@@ -287,7 +290,7 @@ function Modal({ data, setOpenModal }) {
             <Search size={24} />
           </div>
           <button
-            onClick={() => setOpenModal(false)}
+            onClick={() => setOpenModal(false), setSelectedTransactionId(data.data._id)}
             className="text-2xl text-gray-400"
           >
             &times;

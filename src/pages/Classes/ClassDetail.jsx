@@ -13,6 +13,7 @@ import {
   PlusSquareIcon,
 } from "lucide-react";
 import Loader from "../../components/Loader";
+import ScoreModal from "../../components/ScoreModal";
 
 const ClassDetail = () => {
   const { id } = useParams();
@@ -26,6 +27,10 @@ const ClassDetail = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedPeople, setSelectedPeople] = useState({});
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -39,7 +44,7 @@ const ClassDetail = () => {
         `https://pdp-system-backend-1.onrender.com/api/v1/scores/class/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       setClassData(res.data?.data || []);
@@ -64,7 +69,7 @@ const ClassDetail = () => {
       await axios.post(
         `https://pdp-system-backend-1.onrender.com/api/v1/classes/${id}/students`,
         payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       toast.success("Yangi o'quvchi muvaffaqiyatli qo'shildi!");
@@ -79,6 +84,32 @@ const ClassDetail = () => {
     }
   };
 
+  const openModal = (student, type) => {
+    setSelectedStudent({
+      id: student.studentId?._id,
+      name: student.studentId?.fullName,
+    });
+    setModalType(type);
+    setModalOpen(true);
+  };
+
+  const handleScoreSubmit = async () => {
+    try {
+      await axios.post(
+        `https://pdp-system-backend-1.onrender.com/api/v1/transactions`,
+       ...selectedPeople,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      toast.success("Transaction qo'shildi!");
+      setModalOpen(false);
+      fetchClassDetail();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Xatolik");
+    }
+  };
 
   const getStatus = (score) => {
     if (score <= 4) {
@@ -134,9 +165,9 @@ const ClassDetail = () => {
         </div>
       </div>
 
-
       <h2 className="text-3xl font-black text-slate-800 mb-6 flex items-center gap-3">
-        <GraduationCap size={32} className="text-indigo-600" /> O'quvchilar ro'yxati
+        <GraduationCap size={32} className="text-indigo-600" /> O'quvchilar
+        ro'yxati
       </h2>
 
       <div className="grid grid-cols-1 gap-4">
@@ -181,21 +212,23 @@ const ClassDetail = () => {
                 {status.text}
               </span>
 
-             <div className="flex items-center gap-2">
-  <button
-    type="button"
-    className="bg-green-300 text-green-600 w-10 h-10 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm hover:bg-green-400 active:scale-95 transition-all"
-  >
-    +
-  </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => openModal(student, "positive")}
+                  type="button"
+                  className="bg-green-300 text-green-600 w-10 h-10 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm hover:bg-green-400 active:scale-95 transition-all"
+                >
+                  +
+                </button>
 
-  <button
-    type="button"
-    className="bg-red-300 text-red-600 w-10 h-10 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm hover:bg-red-400 active:scale-95 transition-all"
-  >
-    −
-  </button>
-</div>
+                <button
+                  onClick={() => openModal(student, "negative")}
+                  type="button"
+                  className="bg-red-300 text-red-600 w-10 h-10 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm hover:bg-red-400 active:scale-95 transition-all"
+                >
+                  −
+                </button>
+              </div>
             </div>
           );
         })}
@@ -285,6 +318,15 @@ const ClassDetail = () => {
           </div>
         </div>
       )}
+      <ScoreModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        student={selectedStudent}
+        type={modalType}
+        selectedPeople={selectedPeople}
+        setSelectedPeople={setSelectedPeople}
+        onSubmit={handleScoreSubmit}
+      />
     </div>
   );
 };

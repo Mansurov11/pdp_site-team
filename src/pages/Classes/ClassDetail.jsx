@@ -10,7 +10,6 @@ import {
   X,
   Mail,
   User,
-  PlusSquareIcon,
 } from "lucide-react";
 import Loader from "../../components/Loader";
 import ScoreModal from "../../components/ScoreModal";
@@ -22,15 +21,16 @@ const ClassDetail = () => {
   const [classData, setClassData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal & Input States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedPeople, setSelectedPeople] = useState({});
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -42,13 +42,9 @@ const ClassDetail = () => {
     try {
       const res = await axios.get(
         `https://pdp-system-backend-1.onrender.com/api/v1/scores/class/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setClassData(res.data?.data || []);
-      console.log(res.data?.data);
     } catch (err) {
       console.error(err.message);
       toast.error("Sinf ma'lumotlarini yuklashda xatolik");
@@ -60,20 +56,12 @@ const ClassDetail = () => {
   const handleAddStudent = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        fullName: firstName,
-        email: email,
-        role: "student",
-      };
-
       await axios.post(
         `https://pdp-system-backend-1.onrender.com/api/v1/classes/${id}/students`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } },
+        { fullName: firstName, email, role: "student" },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       toast.success("Yangi o'quvchi muvaffaqiyatli qo'shildi!");
-
       setIsModalOpen(false);
       setFirstName("");
       setLastName("");
@@ -85,49 +73,22 @@ const ClassDetail = () => {
   };
 
   const openModal = (student, type) => {
-    setSelectedStudent({
-      id: student.studentId?._id,
-      name: student.studentId?.fullName,
-    });
+    setSelectedStudent(student);
     setModalType(type);
     setModalOpen(true);
   };
 
-  const handleScoreSubmit = async () => {
-    try {
-      await axios.post(
-        `https://pdp-system-backend-1.onrender.com/api/v1/transactions`,
-       ...selectedPeople,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
 
-      toast.success("Transaction qo'shildi!");
-      setModalOpen(false);
-      fetchClassDetail();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Xatolik");
-    }
+  const handleScoreSubmit = () => {
+    fetchClassDetail();
   };
 
   const getStatus = (score) => {
-    if (score <= 4) {
-      return {
-        text: "Sariq ro'yhat",
-        className: "bg-yellow-100 font-bold text-orange-600",
-      };
-    }
-    if (score <= 6) {
-      return {
-        text: "Ogohlantirish",
-        className: "bg-yellow-100 font-bold text-yellow-500",
-      };
-    }
-    return {
-      text: "Normal",
-      className: "bg-green-100 font-bold text-green-600",
-    };
+    if (score <= 4)
+      return { text: "Sariq ro'yhat", className: "bg-yellow-100 font-bold text-orange-600" };
+    if (score <= 6)
+      return { text: "Ogohlantirish", className: "bg-yellow-100 font-bold text-yellow-500" };
+    return { text: "Normal", className: "bg-green-100 font-bold text-green-600" };
   };
 
   if (loading) return <Loader />;
@@ -141,16 +102,13 @@ const ClassDetail = () => {
         <ArrowLeft size={20} /> Orqaga
       </button>
 
-      {/* Header Section */}
+      {/* Header */}
       <div className="bg-white rounded-[40px] p-10 border border-slate-100 shadow-sm mb-10">
         <div className="flex justify-between items-start">
           <div>
             <span className="bg-indigo-50 text-indigo-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
               Sinf ma'lumotlari
             </span>
-            <h1 className="text-6xl font-black text-slate-900 mt-4">
-              {/* If backend doesn't return class name, leave empty */}
-            </h1>
             <div className="flex items-center gap-2 mt-6 text-slate-400 font-bold">
               <Users size={20} />
               <span>{classData.length} o'quvchi ro'yxatda</span>
@@ -166,18 +124,16 @@ const ClassDetail = () => {
       </div>
 
       <h2 className="text-3xl font-black text-slate-800 mb-6 flex items-center gap-3">
-        <GraduationCap size={32} className="text-indigo-600" /> O'quvchilar
-        ro'yxati
+        <GraduationCap size={32} className="text-indigo-600" /> O'quvchilar ro'yxati
       </h2>
 
       <div className="grid grid-cols-1 gap-4">
         {classData.map((student, index) => {
           const status = getStatus(student.disciplineScore);
-
           return (
             <div
               key={student._id || index}
-              className="bg-white p-6 rounded-3xl border border-slate-50 flex items-center justify-between gap-1  group hover:border-indigo-100 transition-all"
+              className="bg-white p-6 rounded-3xl border border-slate-50 flex items-center justify-between gap-1 group hover:border-indigo-100 transition-all"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center font-black text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all text-sm">
@@ -194,21 +150,15 @@ const ClassDetail = () => {
               </div>
 
               <div className="flex g1">
-                <p className="text-3xl text-black font-bold flex items-center gap-1">
-                  {student.disciplineScore}
-                </p>
-                <p className="text-xl text-slate-400 font-bold flex items-end gap-1">
-                  /10
-                </p>
+                <p className="text-3xl text-black font-bold">{student.disciplineScore}</p>
+                <p className="text-xl text-slate-400 font-bold flex items-end">/10</p>
               </div>
 
-              <p className="text-3xl text-blue-400 font-semibold flex items-center gap-1">
+              <p className="text-3xl text-blue-400 font-semibold">
                 + {student.rewardScore}
               </p>
 
-              <span
-                className={`f1 rounded-full m-0 px-4 py-1 ${status.className}`}
-              >
+              <span className={`rounded-full px-4 py-1 ${status.className}`}>
                 {status.text}
               </span>
 
@@ -220,7 +170,6 @@ const ClassDetail = () => {
                 >
                   +
                 </button>
-
                 <button
                   onClick={() => openModal(student, "negative")}
                   type="button"
@@ -234,14 +183,12 @@ const ClassDetail = () => {
         })}
       </div>
 
-      {/* Modal */}
+      {/* Add Student Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-100 p-4">
-          <div className="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black text-slate-800">
-                Yangi o'quvchi
-              </h2>
+              <h2 className="text-3xl font-black text-slate-800">Yangi o'quvchi</h2>
               <X
                 className="cursor-pointer text-slate-400 hover:text-slate-800"
                 onClick={() => setIsModalOpen(false)}
@@ -251,14 +198,9 @@ const ClassDetail = () => {
 
             <form onSubmit={handleAddStudent} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Ism
-                </label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ism</label>
                 <div className="relative">
-                  <User
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
-                    size={18}
-                  />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                   <input
                     required
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
@@ -270,14 +212,9 @@ const ClassDetail = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Familiya
-                </label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Familiya</label>
                 <div className="relative">
-                  <User
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
-                    size={18}
-                  />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                   <input
                     required
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
@@ -289,14 +226,9 @@ const ClassDetail = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Email
-                </label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
                 <div className="relative">
-                  <Mail
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
-                    size={18}
-                  />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                   <input
                     required
                     type="email"
@@ -318,6 +250,7 @@ const ClassDetail = () => {
           </div>
         </div>
       )}
+
       <ScoreModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

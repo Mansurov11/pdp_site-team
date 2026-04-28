@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Loader from "../../components/Loader";
 import { Calendar, TrendingUp, Users, Award } from "lucide-react";
+import axios from "axios";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [hoveredBar, setHoveredBar] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const token = localStorage.getItem("token")
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800);

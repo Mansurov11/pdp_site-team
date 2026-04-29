@@ -154,15 +154,16 @@ const Classes = () => {
                 </div>
 
                 {canManage && (
-                  <button
-                    onClick={() => {
-                      setSelectedClassId(classId);
-                      setIsModalOpen(true);
-                    }}
-                    className="mt-8 w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-indigo-600 hover:text-white text-indigo-600 py-4 rounded-[20px] font-black transition-all active:scale-95"
-                  >
-                    <Plus size={18} /> O'quvchi qo'shish
-                  </button>
+                  // <button
+                  //   onClick={() => {
+                  //     setSelectedClassId(classId);
+                  //     setIsModalOpen(true);
+                  //   }}
+                  //   className="mt-8 w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-indigo-600 hover:text-white text-indigo-600 py-4 rounded-[20px] font-black transition-all active:scale-95"
+                  // >
+                  //   <Plus size={18} /> O'quvchi qo'shish
+                  // </button>
+                  <></>
                 )}
               </div>
             );

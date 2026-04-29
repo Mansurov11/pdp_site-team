@@ -115,10 +115,9 @@ const ClassDetail = () => {
             </div>
           </div>
           <button
-            onClick={() => setIsModalOpen(true)}
             className="bg-indigo-600 text-white p-5 rounded-3xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
           >
-            <UserPlus size={28} />
+            <User size={28} />
           </button>
         </div>
       </div>

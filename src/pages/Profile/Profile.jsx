@@ -152,7 +152,7 @@ const Profile = () => {
               <button 
                 type="submit" 
                 disabled={updating}
-                className="w-full bg-slate-900 text-white py-4.5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-black transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-indigo-600 text-white py-4.5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {updating ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 {updating ? "Saqlanmoqda..." : "Saqlash"}
